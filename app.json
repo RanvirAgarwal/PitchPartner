@@ -38,7 +38,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "@saltmango/expo-audio-stream"
     ],
     "experiments": {
       "typedRoutes": true,
