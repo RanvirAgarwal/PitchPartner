@@ -14,106 +14,148 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import FluidUI from './FluidUI';
+
 
 // --- CONFIGURATION ---
 const FEATHERLESS_API_KEY = 'rc_1a19fe2efea58e9740fa15291133f16d8c2c3238a179a48e566250e032251fbc';
 const DEEPGRAM_API_KEY = '64c0fd8f103661e12ce9ac9695b8b1588f14570a';
 const ELEVENLABS_API_KEY = 'sk_01b7bd3fb09ba0e2a2fefb609901d9609c8b6c77e366ae5f';
 const LLM_MODEL = "deepseek-ai/DeepSeek-R1-0528";
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+// Premium font family
+const FONT = {
+  light: Platform.select({ ios: 'System', android: 'sans-serif-light', web: "'Inter', 'SF Pro Display', -apple-system, sans-serif" }),
+  regular: Platform.select({ ios: 'System', android: 'sans-serif', web: "'Inter', 'SF Pro Display', -apple-system, sans-serif" }),
+  medium: Platform.select({ ios: 'System', android: 'sans-serif-medium', web: "'Inter', 'SF Pro Display', -apple-system, sans-serif" }),
+  bold: Platform.select({ ios: 'System', android: 'sans-serif', web: "'Inter', 'SF Pro Display', -apple-system, sans-serif" }),
+  mono: Platform.select({ ios: 'Menlo', android: 'monospace', web: "'JetBrains Mono', 'SF Mono', monospace" }),
+};
+
+// Warmer palette
+const C = {
+  primary: '#6366F1',
+  primaryLight: '#818CF8',
+  primaryDark: '#4F46E5',
+  accent: '#38BDF8',
+  accentWarm: '#60A5FA',
+  teal: '#2DD4BF',
+  periwinkle: '#A78BFA',
+  lavender: '#C4B5FD',
+  text: '#F1F5F9',
+  textSecondary: '#94A3B8',
+  textMuted: '#64748B',
+  cardBg: 'rgba(30, 27, 75, 0.45)',
+  cardBorder: 'rgba(99, 102, 241, 0.2)',
+  cardBorderActive: 'rgba(99, 102, 241, 0.6)',
+  surface: 'rgba(15, 23, 42, 0.6)',
+  glow: '#7DD3FC',
+};
+
 
 // --- VOICE IDs (ElevenLabs voices) ---
 const VOICES = {
-  brutal: 'pNInz6obpgDQGcFmaJgB', // Adam - Deep, authoritative
-  analytical: 'TxGEqnHWrfWFTfGW9XjX', // Josh - Professional, precise
-  emotional: 'EXAVITQu4vr4xnSDxMaL', // Bella - Warm, empathetic (female but works for emotional)
-  skeptic: 'VR6AewLTigWG4xSOukaG', // Arnold - Skeptical, questioning
-  technical: 'onwK4e9ZLuTAKqWW03F9', // Daniel - Technical, intelligent
+  brutal: 'pNInz6obpgDQGcFmaJgB',
+  analytical: 'TxGEqnHWrfWFTfGW9XjX',
+  emotional: 'EXAVITQu4vr4xnSDxMaL',
+  skeptic: 'VR6AewLTigWG4xSOukaG',
+  technical: 'onwK4e9ZLuTAKqWW03F9',
 };
+
 
 // --- AVATAR CONFIGURATION ---
 const AVATAR_TALKING = { uri: 'https://media1.tenor.com/m/trBThsE-oHAAAAAd/pengu-pudgy.gif' };
 const AVATAR_IDLE = { uri: "https://media1.tenor.com/m/FDQQBo83UMIAAAAd/xylophone-music.gif" };
 
+
 // --- SHARK PERSONALITIES ---
 const SHARKS = {
-  brutal: { 
-    name: "Mr. Ruthless", 
-    emoji: "🦈", 
-    voice: VOICES.brutal, 
-    style: "Extremely harsh, focuses on numbers and ROI. Will tear apart any weakness.", 
-    color: "#FF4444",
-    speed: 1.2 // Faster, aggressive
+  brutal: {
+    name: "Mr. Ruthless",
+    emoji: "🦈",
+    voice: VOICES.brutal,
+    style: "Extremely harsh, focuses on numbers and ROI. Will tear apart any weakness.",
+    color: "#EF4444",
+    speed: 1.2
   },
-  analytical: { 
-    name: "The Calculator", 
-    emoji: "🧮", 
-    voice: VOICES.analytical, 
-    style: "Data-driven, asks probing questions about metrics and unit economics.", 
-    color: "#4444FF",
-    speed: 1.0 // Normal, measured
+  analytical: {
+    name: "The Calculator",
+    emoji: "📊",
+    voice: VOICES.analytical,
+    style: "Data-driven, asks probing questions about metrics and unit economics.",
+    color: "#3B82F6",
+    speed: 1.0
   },
-  emotional: { 
-    name: "Heart & Hustle", 
-    emoji: "❤️", 
-    voice: VOICES.emotional, 
-    style: "Focuses on founder story and passion. Wants to feel the WHY.", 
-    color: "#FF44FF",
-    speed: 0.9 // Slower, empathetic
+  emotional: {
+    name: "Heart & Hustle",
+    emoji: "💜",
+    voice: VOICES.emotional,
+    style: "Focuses on founder story and passion. Wants to feel the WHY.",
+    color: "#A78BFA",
+    speed: 0.9
   },
-  skeptic: { 
-    name: "The Doubter", 
-    emoji: "🤨", 
-    voice: VOICES.skeptic, 
-    style: "Questions everything. Tests your conviction relentlessly.", 
-    color: "#FFAA00",
-    speed: 1.1 // Slightly faster, challenging
+  skeptic: {
+    name: "The Doubter",
+    emoji: "🤨",
+    voice: VOICES.skeptic,
+    style: "Questions everything. Tests your conviction relentlessly.",
+    color: "#F59E0B",
+    speed: 1.1
   },
-  technical: { 
-    name: "Tech Titan", 
-    emoji: "💻", 
-    voice: VOICES.technical, 
-    style: "Deep dives into product, tech stack, and defensibility.", 
-    color: "#00FFAA",
-    speed: 1.0 // Normal, analytical
+  technical: {
+    name: "Tech Titan",
+    emoji: "⚡",
+    voice: VOICES.technical,
+    style: "Deep dives into product, tech stack, and defensibility.",
+    color: "#2DD4BF",
+    speed: 1.0
   }
 };
 
+
 // --- PRACTICE MODES ---
 const MODES = {
-  elevator: { name: "Elevator Pitch", duration: 60, description: "60 seconds to make them remember you", rounds: 3, icon: "🛗" },
+  elevator: { name: "Elevator Pitch", duration: 60, description: "60 seconds to make them remember you", rounds: 3, icon: "⚡" },
   fullPitch: { name: "Full Pitch", duration: 300, description: "5 minutes to tell your story + Q&A", rounds: 5, icon: "🎯" },
-  qanda: { name: "Rapid Fire Q&A", duration: 180, description: "Tough questions, fast answers", rounds: 8, icon: "⚡" },
+  qanda: { name: "Rapid Fire Q&A", duration: 180, description: "Tough questions, fast answers", rounds: 8, icon: "🔥" },
   freestyle: { name: "Freestyle", duration: null, description: "Practice at your own pace", rounds: null, icon: "🎤" }
 };
+
 
 // --- ANIMATED AVATAR COMPONENT ---
 function AnimatedAvatar({ isSpeaking }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (isSpeaking) {
       Animated.loop(
         Animated.sequence([
-          Animated.timing(scaleAnim, {
-            toValue: 1.08,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleAnim, {
-            toValue: 1,
-            duration: 400,
-            useNativeDriver: true,
-          }),
+          Animated.timing(scaleAnim, { toValue: 1.06, duration: 500, useNativeDriver: true }),
+          Animated.timing(scaleAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+        ])
+      ).start();
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, { toValue: 1, duration: 800, useNativeDriver: false }),
+          Animated.timing(glowAnim, { toValue: 0, duration: 800, useNativeDriver: false }),
         ])
       ).start();
     } else {
       scaleAnim.setValue(1);
+      glowAnim.setValue(0);
     }
   }, [isSpeaking]);
 
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.7],
+  });
+
   return (
     <View style={styles.avatarContainer}>
+      <Animated.View style={[styles.avatarGlow, { opacity: glowOpacity }]} />
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <Image
           source={isSpeaking ? AVATAR_TALKING : AVATAR_IDLE}
@@ -121,18 +163,23 @@ function AnimatedAvatar({ isSpeaking }) {
           resizeMode="contain"
         />
       </Animated.View>
-      {isSpeaking && <Text style={styles.speakingLabel}>SPEAKING...</Text>}
+      {isSpeaking && (
+        <View style={styles.speakingPill}>
+          <Text style={styles.speakingLabel}>SPEAKING</Text>
+        </View>
+      )}
     </View>
   );
 }
 
+
 // --- WEB-ONLY Mediapipe runner ---
 function MediapipeWeb({ onMetrics, style }) {
   const containerRef = useRef(null);
-  
+ 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
-    
+   
     let videoEl;
     let stream;
     let rafId;
@@ -144,84 +191,44 @@ function MediapipeWeb({ onMetrics, style }) {
 
     const loadMediapipeScripts = () => {
       return new Promise((resolve, reject) => {
-        if (window.FaceMesh && window.Pose) {
-          resolve();
-          return;
-        }
-
+        if (window.FaceMesh && window.Pose) { resolve(); return; }
         let loadedCount = 0;
         const totalScripts = 2;
-
-        const checkAllLoaded = () => {
-          loadedCount++;
-          if (loadedCount === totalScripts) {
-            resolve();
-          }
-        };
+        const checkAllLoaded = () => { loadedCount++; if (loadedCount === totalScripts) resolve(); };
 
         if (!window.FaceMesh) {
-          const faceMeshScript = document.createElement('script');
-          faceMeshScript.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';
-          faceMeshScript.crossOrigin = 'anonymous';
-          faceMeshScript.onload = checkAllLoaded;
-          faceMeshScript.onerror = () => reject(new Error('Failed to load FaceMesh'));
-          document.head.appendChild(faceMeshScript);
-        } else {
-          checkAllLoaded();
-        }
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';
+          s.crossOrigin = 'anonymous';
+          s.onload = checkAllLoaded;
+          s.onerror = () => reject(new Error('Failed to load FaceMesh'));
+          document.head.appendChild(s);
+        } else { checkAllLoaded(); }
 
         if (!window.Pose) {
-          const poseScript = document.createElement('script');
-          poseScript.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js';
-          poseScript.crossOrigin = 'anonymous';
-          poseScript.onload = checkAllLoaded;
-          poseScript.onerror = () => reject(new Error('Failed to load Pose'));
-          document.head.appendChild(poseScript);
-        } else {
-          checkAllLoaded();
-        }
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js';
+          s.crossOrigin = 'anonymous';
+          s.onload = checkAllLoaded;
+          s.onerror = () => reject(new Error('Failed to load Pose'));
+          document.head.appendChild(s);
+        } else { checkAllLoaded(); }
       });
     };
-    
+   
     const start = async () => {
       try {
         await loadMediapipeScripts();
         await new Promise(resolve => setTimeout(resolve, 100));
+        if (!window.FaceMesh || !window.Pose) throw new Error('MediaPipe libraries not loaded');
 
-        if (!window.FaceMesh || !window.Pose) {
-          throw new Error('MediaPipe libraries not loaded');
-        }
+        faceMesh = new window.FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}` });
+        faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        faceMesh.onResults((r) => { if (r.multiFaceLandmarks?.[0]) lastFaceLandmarks = r.multiFaceLandmarks[0]; });
 
-        faceMesh = new window.FaceMesh({
-          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
-        });
-        faceMesh.setOptions({
-          maxNumFaces: 1,
-          refineLandmarks: true,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5
-        });
-        faceMesh.onResults((results) => {
-          if (results.multiFaceLandmarks && results.multiFaceLandmarks[0]) {
-            lastFaceLandmarks = results.multiFaceLandmarks[0];
-          }
-        });
-
-        pose = new window.Pose({
-          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
-        });
-        pose.setOptions({
-          modelComplexity: 1,
-          smoothLandmarks: true,
-          enableSegmentation: false,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5
-        });
-        pose.onResults((results) => {
-          if (results.poseLandmarks) {
-            lastPoseLandmarks = results.poseLandmarks;
-          }
-        });
+        pose = new window.Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+        pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, enableSegmentation: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        pose.onResults((r) => { if (r.poseLandmarks) lastPoseLandmarks = r.poseLandmarks; });
 
         videoEl = document.createElement('video');
         videoEl.setAttribute('playsinline', 'true');
@@ -231,12 +238,10 @@ function MediapipeWeb({ onMetrics, style }) {
         videoEl.style.height = '100%';
         videoEl.style.objectFit = 'cover';
         videoEl.style.transform = 'scaleX(-1)';
+        videoEl.style.borderRadius = '16px';
         containerRef.current?.appendChild(videoEl);
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
-          audio: false
-        });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
         videoEl.srcObject = stream;
         await videoEl.play();
 
@@ -249,108 +254,49 @@ function MediapipeWeb({ onMetrics, style }) {
           rafId = requestAnimationFrame(processFrame);
         };
         processFrame();
-
-        metricsInterval = setInterval(() => {
-          updateScores();
-        }, 200);
-
-      } catch (e) {
-        console.error('Mediapipe init error:', e);
-      }
+        metricsInterval = setInterval(() => updateScores(), 200);
+      } catch (e) { console.error('Mediapipe init error:', e); }
     };
 
     const computeEyeContactScore = (faceLm) => {
       if (!faceLm || faceLm.length < 468) return 0;
-      
       const noseTip = faceLm[1];
       const leftPupil = faceLm[468] || faceLm[133];
       const rightPupil = faceLm[473] || faceLm[362];
-      
       if (!noseTip || !leftPupil || !rightPupil) return 0;
-
-      const eyeMidpoint = {
-        x: (leftPupil.x + rightPupil.x) / 2,
-        y: (leftPupil.y + rightPupil.y) / 2,
-        z: ((leftPupil.z || 0) + (rightPupil.z || 0)) / 2
-      };
-
-      const yawOffset = Math.abs(noseTip.x - eyeMidpoint.x);
-      const yawPenalty = Math.min(1, yawOffset * 15);
-
-      const pitchOffset = Math.abs(noseTip.y - eyeMidpoint.y);
-      const pitchPenalty = Math.min(1, pitchOffset * 10);
-
-      const eyeDistance = Math.abs(leftPupil.y - rightPupil.y);
-      const rollPenalty = Math.min(1, eyeDistance * 8);
-
-      const score = 100 * (1 - (yawPenalty * 0.5 + pitchPenalty * 0.35 + rollPenalty * 0.15));
-      return Math.max(0, Math.min(100, Math.round(score)));
+      const eyeMid = { x: (leftPupil.x + rightPupil.x) / 2, y: (leftPupil.y + rightPupil.y) / 2, z: ((leftPupil.z || 0) + (rightPupil.z || 0)) / 2 };
+      const yawPenalty = Math.min(1, Math.abs(noseTip.x - eyeMid.x) * 15);
+      const pitchPenalty = Math.min(1, Math.abs(noseTip.y - eyeMid.y) * 10);
+      const rollPenalty = Math.min(1, Math.abs(leftPupil.y - rightPupil.y) * 8);
+      return Math.max(0, Math.min(100, Math.round(100 * (1 - (yawPenalty * 0.5 + pitchPenalty * 0.35 + rollPenalty * 0.15)))));
     };
 
     const computePostureScore = (poseLm) => {
       if (!poseLm || poseLm.length < 33) return 0;
-      
-      const leftShoulder = poseLm[11];
-      const rightShoulder = poseLm[12];
-      const leftEar = poseLm[7];
-      const rightEar = poseLm[8];
-      const leftHip = poseLm[23];
-      const rightHip = poseLm[24];
-      
-      if (!leftShoulder || !rightShoulder || !leftEar || !rightEar) {
-        return 0;
-      }
-
-      if (leftShoulder.visibility < 0.5 || rightShoulder.visibility < 0.5 || 
-          leftEar.visibility < 0.5 || rightEar.visibility < 0.5) {
-        return 0;
-      }
-
+      const ls = poseLm[11], rs = poseLm[12], le = poseLm[7], re = poseLm[8], lh = poseLm[23], rh = poseLm[24];
+      if (!ls || !rs || !le || !re) return 0;
+      if (ls.visibility < 0.5 || rs.visibility < 0.5 || le.visibility < 0.5 || re.visibility < 0.5) return 0;
       let score = 100;
-
-      const shoulderYDiff = Math.abs(leftShoulder.y - rightShoulder.y);
-      const shoulderPenalty = Math.min(35, shoulderYDiff * 300);
-      score -= shoulderPenalty;
-
-      const shoulderCenterX = (leftShoulder.x + rightShoulder.x) / 2;
-      const earCenterX = (leftEar.x + rightEar.x) / 2;
-      const forwardLean = Math.abs(earCenterX - shoulderCenterX);
-      const leanPenalty = Math.min(30, forwardLean * 200);
-      score -= leanPenalty;
-
-      const shoulderCenterY = (leftShoulder.y + rightShoulder.y) / 2;
-      const earCenterY = (leftEar.y + rightEar.y) / 2;
-      const verticalGap = shoulderCenterY - earCenterY;
-      
-      if (verticalGap < 0.1) {
-        score -= 30;
-      } else if (verticalGap < 0.15) {
-        score -= 15;
+      score -= Math.min(35, Math.abs(ls.y - rs.y) * 300);
+      const scx = (ls.x + rs.x) / 2, ecx = (le.x + re.x) / 2;
+      score -= Math.min(30, Math.abs(ecx - scx) * 200);
+      const scy = (ls.y + rs.y) / 2, ecy = (le.y + re.y) / 2;
+      const vg = scy - ecy;
+      if (vg < 0.1) score -= 30; else if (vg < 0.15) score -= 15;
+      if (lh && rh && lh.visibility > 0.5 && rh.visibility > 0.5) {
+        score -= Math.min(15, Math.abs(scx - (lh.x + rh.x) / 2) * 100);
       }
-
-      if (leftHip && rightHip && leftHip.visibility > 0.5 && rightHip.visibility > 0.5) {
-        const hipCenterX = (leftHip.x + rightHip.x) / 2;
-        const spineAlignment = Math.abs(shoulderCenterX - hipCenterX);
-        const spinePenalty = Math.min(15, spineAlignment * 100);
-        score -= spinePenalty;
-      }
-
       return Math.max(0, Math.min(100, Math.round(score)));
     };
 
     const updateScores = () => {
       if (!running) return;
-      
-      const eyeScore = lastFaceLandmarks ? computeEyeContactScore(lastFaceLandmarks) : 0;
-      const postureScore = lastPoseLandmarks ? computePostureScore(lastPoseLandmarks) : 0;
-      
-      if (eyeScore > 0 || postureScore > 0) {
-        onMetrics?.({ eyeContact: eyeScore, posture: postureScore, ts: Date.now() });
-      }
+      const eye = lastFaceLandmarks ? computeEyeContactScore(lastFaceLandmarks) : 0;
+      const post = lastPoseLandmarks ? computePostureScore(lastPoseLandmarks) : 0;
+      if (eye > 0 || post > 0) onMetrics?.({ eyeContact: eye, posture: post, ts: Date.now() });
     };
 
     start();
-
     return () => {
       running = false;
       if (rafId) cancelAnimationFrame(rafId);
@@ -363,8 +309,8 @@ function MediapipeWeb({ onMetrics, style }) {
   if (Platform.OS !== 'web') {
     return (
       <View style={[style, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: '#ccc', textAlign: 'center', padding: 12 }}>
-          Vision analysis runs on web in this build. Open in a browser to use Mediapipe.
+        <Text style={{ color: C.textSecondary, textAlign: 'center', padding: 12, fontFamily: FONT.regular }}>
+          Vision analysis available on web. Open in a browser for Mediapipe.
         </Text>
       </View>
     );
@@ -372,6 +318,7 @@ function MediapipeWeb({ onMetrics, style }) {
 
   return <View ref={containerRef} style={style} />;
 }
+
 
 // --- APP ---
 export default function App() {
@@ -392,13 +339,8 @@ export default function App() {
   const [selectedMode, setSelectedMode] = useState(null);
 
   const [sessionMetrics, setSessionMetrics] = useState({
-    fillerWords: 0,
-    totalWords: 0,
-    clarityScore: 0,
-    confidenceScore: 0,
-    eyeContactScore: 0,
-    postureScore: 0,
-    rounds: 0
+    fillerWords: 0, totalWords: 0, clarityScore: 0, confidenceScore: 0,
+    eyeContactScore: 0, postureScore: 0, rounds: 0
   });
   const [currentEyeContact, setCurrentEyeContact] = useState(0);
   const [currentPosture, setCurrentPosture] = useState(0);
@@ -410,295 +352,224 @@ export default function App() {
   const [roundNumber, setRoundNumber] = useState(1);
 
   useEffect(() => {
-    initApp();
-    return () => cleanup();
+    if (Platform.OS === 'web') {
+      // Inject Inter font
+      const link = document.createElement('link');
+      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap';
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+
+      const handlePopState = (e) => { e.preventDefault(); window.history.pushState(null, '', window.location.pathname); };
+      const preventNavigation = (e) => {
+        const target = e.target?.closest('a');
+        if (target) { const href = target.getAttribute('href'); if (href && (href.includes('pitch') || href.includes('shark') || href.includes('arena'))) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); return false; } }
+      };
+      window.addEventListener('popstate', handlePopState);
+      document.addEventListener('click', preventNavigation, true);
+      return () => { window.removeEventListener('popstate', handlePopState); document.removeEventListener('click', preventNavigation, true); };
+    }
   }, []);
+
+  useEffect(() => { initApp(); return () => cleanup(); }, []);
 
   const initApp = async () => {
     try {
       if (Platform.OS !== 'web') {
         const { status } = await Audio.requestPermissionsAsync();
         if (status === 'granted') {
-          await Audio.setAudioModeAsync({
-            allowsRecordingIOS: true,
-            playsInSilentModeIOS: true,
-            playThroughEarpieceAndroid: false,
-          });
+          await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true, playThroughEarpieceAndroid: false });
         }
       }
-    } catch (e) {
-      console.error("Init error:", e);
-    }
+    } catch (e) { console.error("Init error:", e); }
   };
 
   const cleanup = () => {
     if (timerRef.current) clearInterval(timerRef.current);
-    if (recordingRef.current && Platform.OS !== 'web') {
-      recordingRef.current.stopAndUnloadAsync?.().catch(() => {});
-    }
-    if (soundRef.current && Platform.OS !== 'web') {
-      soundRef.current.unloadAsync?.().catch(() => {});
-    }
-    if (currentAudioRef.current) {
-      try {
-        currentAudioRef.current.pause();
-        currentAudioRef.current = null;
-      } catch {}
-    }
+    if (recordingRef.current && Platform.OS !== 'web') recordingRef.current.stopAndUnloadAsync?.().catch(() => {});
+    if (soundRef.current && Platform.OS !== 'web') soundRef.current.unloadAsync?.().catch(() => {});
+    if (currentAudioRef.current) { try { currentAudioRef.current.pause(); currentAudioRef.current = null; } catch {} }
     setIsSpeaking(false);
   };
 
   const onMediapipeMetrics = useCallback(({ eyeContact, posture, ts }) => {
     const eyeScore = Math.round(eyeContact || 0);
     const postureScore = Math.round(posture || 0);
-    
     setCurrentEyeContact(eyeScore);
     setCurrentPosture(postureScore);
-    
     setVisualSamples(prev => {
       const updated = [...prev, { eyeContact: eyeScore, posture: postureScore, timestamp: ts || Date.now() }];
-      
       if (updated.length >= 10) {
-        const recentEyes = updated.slice(-10).map(s => s.eyeContact);
-        const mean = recentEyes.reduce((a, b) => a + b) / recentEyes.length;
-        const variance = recentEyes.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recentEyes.length;
-        setEyeContactVariance(Math.round(variance));
+        const recent = updated.slice(-10).map(s => s.eyeContact);
+        const mean = recent.reduce((a, b) => a + b) / recent.length;
+        setEyeContactVariance(Math.round(recent.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / recent.length));
       }
-      
-      setSessionMetrics(prevMetrics => {
-        if (updated.length === 0) return prevMetrics;
-        
-        let eyeSum = 0, postureSum = 0, weightSum = 0;
-        updated.forEach((s, idx) => {
-          const w = idx + 1;
-          eyeSum += s.eyeContact * w;
-          postureSum += s.posture * w;
-          weightSum += w;
-        });
-        
-        return {
-          ...prevMetrics,
-          eyeContactScore: weightSum > 0 ? Math.round(eyeSum / weightSum) : 0,
-          postureScore: weightSum > 0 ? Math.round(postureSum / weightSum) : 0,
-        };
+      setSessionMetrics(prevM => {
+        if (updated.length === 0) return prevM;
+        let eyeSum = 0, postSum = 0, wSum = 0;
+        updated.forEach((s, idx) => { const w = idx + 1; eyeSum += s.eyeContact * w; postSum += s.posture * w; wSum += w; });
+        return { ...prevM, eyeContactScore: wSum > 0 ? Math.round(eyeSum / wSum) : 0, postureScore: wSum > 0 ? Math.round(postSum / wSum) : 0 };
       });
-      
       return updated;
     });
   }, []);
 
-  const generateVisualInsights = async () => {
-    if (visualSamples.length === 0) return "No visual data collected.";
-    
-    const avgEye = Math.round(visualSamples.reduce((sum, s) => sum + s.eyeContact, 0) / visualSamples.length);
-    const avgPosture = Math.round(visualSamples.reduce((sum, s) => sum + s.posture, 0) / visualSamples.length);
-    
+  const generateAIAnalysis = async () => {
+    const avgEye = visualSamples.length > 0 ? Math.round(visualSamples.reduce((s, v) => s + v.eyeContact, 0) / visualSamples.length) : 0;
+    const avgPosture = visualSamples.length > 0 ? Math.round(visualSamples.reduce((s, v) => s + v.posture, 0) / visualSamples.length) : 0;
     const eyeScores = visualSamples.map(s => s.eyeContact);
-    const eyeMean = eyeScores.reduce((a, b) => a + b) / eyeScores.length;
-    const eyeVariance = eyeScores.reduce((sum, val) => sum + Math.pow(val - eyeMean, 2), 0) / eyeScores.length;
-    const eyeStdDev = Math.sqrt(eyeVariance);
-    
-    let driftCount = 0;
-    for (let i = 1; i < eyeScores.length; i++) {
-      if (Math.abs(eyeScores[i] - eyeScores[i-1]) > 20) driftCount++;
-    }
-    const driftPercentage = Math.round((driftCount / eyeScores.length) * 100);
-    
+    const eyeVariance = eyeScores.length > 1 ? Math.round(eyeScores.reduce((sum, val, i, arr) => { const mean = arr.reduce((a, b) => a + b) / arr.length; return sum + Math.pow(val - mean, 2); }, 0) / eyeScores.length) : 0;
+    const userMessages = messages.filter(m => m.role === 'user');
+    const avgWordsPerResponse = userMessages.length > 0 ? Math.round(userMessages.reduce((s, m) => s + m.content.split(/\s+/).length, 0) / userMessages.length) : 0;
+    const conversationContext = userMessages.map(m => m.content).join(' | ');
+    const sharkName = selectedShark ? SHARKS[selectedShark].name : 'the investor';
+    const modeName = selectedMode ? MODES[selectedMode].name : 'practice';
+
     try {
       const response = await fetch("https://api.featherless.ai/v1/chat/completions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${FEATHERLESS_API_KEY}`
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${FEATHERLESS_API_KEY}` },
         body: JSON.stringify({
           model: LLM_MODEL,
           messages: [
             {
               role: 'system',
-              content: "You are an elite pitch coach. Provide ONLY final actionable advice. NO reasoning, NO thinking process. Just 3-4 direct sentences."
+              content: `You are an elite pitch coach who has trained founders that raised $500M+ collectively. You give sharp, memorable, actionable feedback that founders actually remember and use.
+
+Your analysis style:
+- Open with a vivid, honest one-line verdict (like "You pitched like someone reading a grocery list" or "That was a founder who knows their numbers cold")
+- Use concrete examples from what they actually said
+- Compare to what great pitches sound like
+- Give exactly 3 specific drills or exercises they can do TODAY
+- End with one sentence of genuine encouragement or a challenge
+
+Write 4-5 paragraphs. Be direct, witty, and constructive. Never be generic. Never use bullet points or headers. Write like you're talking to them over coffee after the session.
+
+The founder practiced in "${modeName}" mode against "${sharkName}".`
             },
             {
               role: 'user',
-              content: `Eye Contact: ${avgEye}%, Drift: ${driftPercentage}%, Posture: ${avgPosture}%. Give 3-4 sentences of specific advice.`
+              content: `Session data:
+- Eye Contact: ${avgEye}% (variance: ${eyeVariance} — ${eyeVariance > 200 ? 'very inconsistent' : eyeVariance > 100 ? 'somewhat inconsistent' : 'fairly steady'})
+- Posture: ${avgPosture}%
+- Clarity: ${sessionMetrics.clarityScore}%
+- Confidence: ${sessionMetrics.confidenceScore}%
+- Words: ${sessionMetrics.totalWords}, Fillers: ${sessionMetrics.fillerWords} (${sessionMetrics.totalWords > 0 ? Math.round(sessionMetrics.fillerWords / sessionMetrics.totalWords * 100) : 0}% filler rate)
+- Avg response: ${avgWordsPerResponse} words
+- Rounds: ${sessionMetrics.rounds}
+
+What they said:
+${conversationContext || '[No speech captured]'}
+
+Give your analysis.`
             }
           ],
-          max_tokens: 150,
-          temperature: 0.7
+          max_tokens: 900,
+          temperature: 0.8
         })
       });
       const data = await response.json();
-      return data.choices?.[0]?.message?.content || "Continue practicing your visual presence.";
+      let analysis = data.choices?.[0]?.message?.content || '';
+      if (analysis.includes('</think>')) analysis = analysis.split('</think>')[1]?.trim() || analysis;
+      analysis = analysis.replace(/<think>[\s\S]*$/g, '').trim();
+      return analysis || generateFallbackAnalysis(avgEye, avgPosture, avgWordsPerResponse, eyeVariance);
     } catch (e) {
-      console.error('Visual insights error:', e);
-      return `Eye contact averaged ${avgEye}% with ${driftPercentage}% drift. Posture averaged ${avgPosture}%. Lock eyes with camera for 3+ seconds.`;
+      console.error('AI Analysis error:', e);
+      return generateFallbackAnalysis(avgEye, avgPosture, avgWordsPerResponse, eyeVariance);
     }
+  };
+
+  const generateFallbackAnalysis = (avgEye, avgPosture, avgWords, eyeVar) => {
+    const fillerRate = sessionMetrics.totalWords > 0 ? Math.round(sessionMetrics.fillerWords / sessionMetrics.totalWords * 100) : 0;
+    const verdict = sessionMetrics.confidenceScore >= 70 ? "You showed real conviction in there — now let's sharpen the edges." : sessionMetrics.confidenceScore >= 40 ? "Decent foundation, but you're leaving persuasion points on the table." : "Honest truth: that pitch needs serious work before it's investor-ready.";
+    
+    return `${verdict}
+
+Your speech clocked in at ${sessionMetrics.totalWords} words across ${sessionMetrics.rounds} rounds with a ${fillerRate}% filler rate. ${fillerRate > 8 ? "That filler rate is a red flag — every 'um' and 'like' chips away at your credibility. Investors notice this immediately." : fillerRate > 3 ? "Your filler rate is manageable but still noticeable. The best founders speak with clean, deliberate sentences." : "Clean speech — that's a real advantage. You sound like someone who's practiced."} Your clarity score of ${sessionMetrics.clarityScore}% ${sessionMetrics.clarityScore >= 75 ? "shows you can articulate your ideas well" : "suggests your message isn't landing as crisply as it needs to"}.
+
+${avgEye >= 70 ? "Your eye contact was solid at " + avgEye + "%, which builds trust." : "Eye contact at " + avgEye + "% is below where it needs to be — investors read averted eyes as uncertainty or dishonesty."} ${eyeVar > 200 ? "More concerning is how inconsistent it was — you'd lock in then drift away, which reads as distracted." : ""} Posture held at ${avgPosture}%, ${avgPosture >= 75 ? "projecting the physical confidence that backs up your words." : "which undermines your message. Slouching or shifting tells investors you're not sure about what you're saying."}
+
+Here are three things to do before your next session. First, record yourself giving your 30-second hook and count every filler word — then do it again until you hit zero. Second, practice the "3-second hold" — pick a spot on camera and hold eye contact for a full three seconds before naturally shifting. Third, ${avgWords < 30 ? "expand your answers. You're being too brief — investors want depth, not telegrams. Practice the STAR method: Situation, Task, Action, Result." : avgWords > 90 ? "cut your answers in half. You're over-explaining. For every answer, find the one sentence that matters most and lead with it." : "work on your opening line for each answer — make the first five words count, because that's when investors decide whether to keep listening."}
+
+${sessionMetrics.confidenceScore >= 60 ? "You've got the raw material. Now it's about repetition until this pitch feels like breathing." : "Don't be discouraged — every great founder bombed their first pitches. The ones who made it just kept showing up. Come back tomorrow and beat today's scores."}`;
   };
 
   const analyzeTranscript = (transcript) => {
     const words = transcript.toLowerCase().split(/\s+/).filter(w => w.length > 0);
     const totalWords = words.length;
-    
-    if (totalWords === 0) return {
-      totalWords: 0,
-      fillerCount: 0,
-      weakCount: 0,
-      powerCount: 0,
-      clarityScore: 0,
-      confidenceScore: 0
-    };
-    
-    const fillers = ['um', 'uh', 'like', 'you know', 'basically', 'actually', 'literally'];
+    if (totalWords === 0) return { totalWords: 0, fillerCount: 0, weakCount: 0, powerCount: 0, clarityScore: 0, confidenceScore: 0 };
+    const fillers = ['um', 'uh', 'like', 'you know', 'basically', 'actually', 'literally', 'so', 'right'];
     let fillerCount = 0;
-    fillers.forEach(filler => {
-      const regex = new RegExp(`\\b${filler}\\b`, 'gi');
-      const matches = transcript.match(regex);
-      if (matches) fillerCount += matches.length;
-    });
-    
-    const weakPhrases = ['i think', 'maybe', 'sort of', 'kind of', 'probably'];
+    fillers.forEach(f => { const m = transcript.match(new RegExp(`\\b${f}\\b`, 'gi')); if (m) fillerCount += m.length; });
+    const weakPhrases = ['i think', 'maybe', 'sort of', 'kind of', 'probably', 'i guess', 'not sure'];
     let weakCount = 0;
-    weakPhrases.forEach(phrase => {
-      if (transcript.toLowerCase().includes(phrase)) weakCount++;
-    });
-    
-    const powerWords = ['proven', 'results', 'revenue', 'growth', 'customers', 'traction'];
+    weakPhrases.forEach(p => { if (transcript.toLowerCase().includes(p)) weakCount++; });
+    const powerWords = ['proven', 'results', 'revenue', 'growth', 'customers', 'traction', 'profitable', 'scale', 'market', 'opportunity', 'competitive', 'advantage', 'data', 'metrics'];
     let powerCount = 0;
-    powerWords.forEach(word => {
-      if (transcript.toLowerCase().includes(word)) powerCount++;
-    });
-    
+    powerWords.forEach(w => { if (transcript.toLowerCase().includes(w)) powerCount++; });
     const fillerRatio = fillerCount / totalWords;
-    const clarityScore = Math.max(0, Math.min(100, 100 - (fillerRatio * 500)));
-    const confidenceScore = Math.max(0, Math.min(100, 50 + (powerCount * 10) - (weakCount * 15)));
-    
-    return {
-      totalWords,
-      fillerCount,
-      weakCount,
-      powerCount,
-      clarityScore: Math.round(clarityScore),
-      confidenceScore: Math.round(confidenceScore)
-    };
+    const clarityScore = Math.max(0, Math.min(100, 100 - (fillerRatio * 400) - (weakCount * 5)));
+    const confidenceScore = Math.max(0, Math.min(100, 45 + (powerCount * 8) - (weakCount * 12) - (fillerCount * 3)));
+    return { totalWords, fillerCount, weakCount, powerCount, clarityScore: Math.round(clarityScore), confidenceScore: Math.round(confidenceScore) };
   };
 
   const stopAudio = async () => {
     try {
       setIsSpeaking(false);
-      
       if (Platform.OS === 'web') {
-        if (currentAudioRef.current) {
-          currentAudioRef.current.pause();
-          currentAudioRef.current.currentTime = 0;
-          currentAudioRef.current = null;
-        }
+        if (currentAudioRef.current) { currentAudioRef.current.pause(); currentAudioRef.current.currentTime = 0; currentAudioRef.current = null; }
         return;
       }
       if (soundRef.current) {
-        const status = await soundRef.current.getStatusAsync();
-        if (status.isLoaded && status.isPlaying) {
-          await soundRef.current.stopAsync();
-        }
+        const s = await soundRef.current.getStatusAsync();
+        if (s.isLoaded && s.isPlaying) await soundRef.current.stopAsync();
       }
-    } catch (e) {
-      console.error("Stop audio error:", e);
-    }
+    } catch (e) { console.error("Stop audio error:", e); }
   };
 
   const speak = async (text, voiceId, speed = 1.0) => {
     try {
       setIsSpeaking(true);
-      
       if (Platform.OS === 'web') {
         const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "xi-api-key": ELEVENLABS_API_KEY
-          },
-          body: JSON.stringify({
-            text,
-            model_id: "eleven_turbo_v2_5", // Faster model
-            voice_settings: { 
-              stability: 0.6, 
-              similarity_boost: 0.8,
-              style: 0.5,
-              use_speaker_boost: true
-            }
-          })
+          headers: { "Content-Type": "application/json", "xi-api-key": ELEVENLABS_API_KEY },
+          body: JSON.stringify({ text, model_id: "eleven_turbo_v2_5", voice_settings: { stability: 0.6, similarity_boost: 0.8, style: 0.5, use_speaker_boost: true } })
         });
-        if (!resp.ok) {
-          setIsSpeaking(false);
-          return;
-        }
-        const arrayBuffer = await resp.arrayBuffer();
-        const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+        if (!resp.ok) { setIsSpeaking(false); return; }
+        const ab = await resp.arrayBuffer();
+        const blob = new Blob([ab], { type: 'audio/mpeg' });
         const url = URL.createObjectURL(blob);
         const audio = new window.Audio(url);
-        audio.playbackRate = speed; // Apply speed
+        audio.playbackRate = speed;
         currentAudioRef.current = audio;
         audio.onended = () => setIsSpeaking(false);
         audio.onerror = () => setIsSpeaking(false);
-        audio.play().catch(e => {
-          console.error('Audio play error', e);
-          setIsSpeaking(false);
-        });
+        audio.play().catch(() => setIsSpeaking(false));
         return;
       }
-      
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-      });
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
       const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": ELEVENLABS_API_KEY
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_turbo_v2_5",
-          voice_settings: { 
-            stability: 0.6, 
-            similarity_boost: 0.8,
-            style: 0.5,
-            use_speaker_boost: true
-          }
-        })
+        headers: { "Content-Type": "application/json", "xi-api-key": ELEVENLABS_API_KEY },
+        body: JSON.stringify({ text, model_id: "eleven_turbo_v2_5", voice_settings: { stability: 0.6, similarity_boost: 0.8, style: 0.5, use_speaker_boost: true } })
       });
-      if (!response.ok) {
-        setIsSpeaking(false);
-        return;
-      }
-      const arrayBuffer = await response.arrayBuffer();
-      const uint8 = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
-      const base64Audio = btoa(binary);
-      if (!soundRef.current) {
-        soundRef.current = new Audio.Sound();
-      }
+      if (!response.ok) { setIsSpeaking(false); return; }
+      const ab = await response.arrayBuffer();
+      const u8 = new Uint8Array(ab);
+      let bin = ''; for (let i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
+      const b64 = btoa(bin);
+      if (!soundRef.current) soundRef.current = new Audio.Sound();
       await soundRef.current.unloadAsync().catch(() => {});
-      await soundRef.current.loadAsync({ uri: `data:audio/mpeg;base64,${base64Audio}` });
-      await soundRef.current.setRateAsync(speed, true); // Apply speed on native
-      soundRef.current.setOnPlaybackStatusUpdate((status) => {
-        if (status.didJustFinish) {
-          setIsSpeaking(false);
-        }
-      });
+      await soundRef.current.loadAsync({ uri: `data:audio/mpeg;base64,${b64}` });
+      await soundRef.current.setRateAsync(speed, true);
+      soundRef.current.setOnPlaybackStatusUpdate((s) => { if (s.didJustFinish) setIsSpeaking(false); });
       await soundRef.current.playAsync();
-    } catch (e) {
-      console.error("TTS Error:", e);
-      setIsSpeaking(false);
-    }
+    } catch (e) { console.error("TTS Error:", e); setIsSpeaking(false); }
   };
 
   const startRecording = useCallback(async () => {
     if (isRecording || loading) return;
-    
     await stopAudio();
-    
     try {
       setStatus("LISTENING...");
       if (Platform.OS === 'web') {
@@ -706,30 +577,18 @@ export default function App() {
         const mime = 'audio/webm;codecs=opus';
         const recorder = new MediaRecorder(stream, { mimeType: mime });
         const chunks = [];
-        recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+        recorder.ondataavailable = (e) => { if (e.data?.size > 0) chunks.push(e.data); };
         recorder.start();
         recordingRef.current = { recorder, stream, chunks, mime };
         setIsRecording(true);
         return;
       }
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-        playThroughEarpieceAndroid: false,
-      });
-      if (recordingRef.current) {
-        try { await recordingRef.current.stopAndUnloadAsync(); } catch (e) {}
-      }
-      const { recording: newRecording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      recordingRef.current = newRecording;
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true, playThroughEarpieceAndroid: false });
+      if (recordingRef.current) try { await recordingRef.current.stopAndUnloadAsync(); } catch {}
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      recordingRef.current = recording;
       setIsRecording(true);
-    } catch (err) {
-      console.error("Recording error:", err);
-      setStatus("MIC ERROR: " + err.message);
-      setIsRecording(false);
-    }
+    } catch (err) { console.error("Recording error:", err); setStatus("MIC ERROR"); setIsRecording(false); }
   }, [isRecording, loading]);
 
   const stopAndProcess = useCallback(async () => {
@@ -738,71 +597,47 @@ export default function App() {
     setLoading(true);
     setStatus("ANALYZING...");
     try {
-      let audioBody;
-      let contentType = 'audio/m4a';
+      let audioBody, contentType = 'audio/m4a';
       if (Platform.OS === 'web') {
         const { recorder, stream, chunks, mime } = recordingRef.current;
         await new Promise(resolve => { recorder.onstop = resolve; recorder.stop(); });
         stream.getTracks().forEach(t => t.stop());
-        const blob = new Blob(chunks, { type: mime });
-        audioBody = blob;
+        audioBody = new Blob(chunks, { type: mime });
         contentType = mime;
         recordingRef.current = null;
       } else {
         await recordingRef.current.stopAndUnloadAsync();
         const uri = recordingRef.current.getURI();
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
-        });
-        const base64Audio = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64
-        });
-        const binaryString = atob(base64Audio);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false, playsInSilentModeIOS: true });
+        const b64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
         audioBody = bytes;
-        contentType = 'audio/m4a';
         recordingRef.current = null;
       }
       const dgResp = await fetch(`https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true`, {
         method: "POST",
-        headers: {
-          "Authorization": `Token ${DEEPGRAM_API_KEY}`,
-          "Content-Type": contentType
-        },
+        headers: { "Authorization": `Token ${DEEPGRAM_API_KEY}`, "Content-Type": contentType },
         body: audioBody
       });
-      if (!dgResp.ok) {
-        const err = await dgResp.text().catch(() => '');
-        console.error('Deepgram error', dgResp.status, err);
-        setStatus(`STT error ${dgResp.status}`);
-        setLoading(false);
-        return;
-      }
+      if (!dgResp.ok) { setStatus(`STT error ${dgResp.status}`); setLoading(false); return; }
       const dgJson = await dgResp.json();
       const transcript = dgJson.results?.channels?.[0]?.alternatives?.[0]?.transcript;
-      if (transcript && transcript.trim().length > 0) {
+      if (transcript?.trim().length > 0) {
         const analysis = analyzeTranscript(transcript);
         setSessionMetrics(prev => ({
           totalWords: prev.totalWords + analysis.totalWords,
           fillerWords: prev.fillerWords + analysis.fillerCount,
-          clarityScore: prev.rounds === 0 ? analysis.clarityScore : Math.round((prev.clarityScore + analysis.clarityScore) / 2),
-          confidenceScore: prev.rounds === 0 ? analysis.confidenceScore : Math.round((prev.confidenceScore + analysis.confidenceScore) / 2),
+          clarityScore: prev.rounds === 0 ? analysis.clarityScore : Math.round((prev.clarityScore * 0.6 + analysis.clarityScore * 0.4)),
+          confidenceScore: prev.rounds === 0 ? analysis.confidenceScore : Math.round((prev.confidenceScore * 0.6 + analysis.confidenceScore * 0.4)),
           eyeContactScore: prev.eyeContactScore,
           postureScore: prev.postureScore,
           rounds: prev.rounds + 1
         }));
         await handleBrain(transcript, analysis);
-      } else {
-        setStatus("DIDN'T CATCH THAT - TRY AGAIN");
-        setLoading(false);
-      }
-    } catch (e) {
-      console.error("Processing error:", e);
-      setStatus("ERROR: " + e.message);
-      setLoading(false);
-    }
+      } else { setStatus("DIDN'T CATCH THAT"); setLoading(false); }
+    } catch (e) { console.error("Processing error:", e); setStatus("ERROR"); setLoading(false); }
   }, [isRecording, selectedShark, selectedMode, messages]);
 
   const handleBrain = async (userText, speechAnalysis) => {
@@ -810,130 +645,85 @@ export default function App() {
     const mode = MODES[selectedMode];
     const updatedMessages = [...messages, { role: 'user', content: userText }];
     setMessages(updatedMessages);
-    
-    // Build feedback about visuals if they're poor
-    let visualFeedback = '';
-    if (currentEyeContact > 0 && currentEyeContact < 50) {
-      visualFeedback += `Your eye contact is weak (${currentEyeContact}%). `;
-    }
-    if (currentPosture > 0 && currentPosture < 50) {
-      visualFeedback += `Your posture needs work (${currentPosture}%). `;
-    }
-    
-    const systemPrompt = `You are ${shark.name}, a tough Shark Tank investor. ${shark.style}
 
-Round ${roundNumber}. Ask ONE tough question OR give ONE critique. Stay in character.
-${visualFeedback ? `Also comment on this: ${visualFeedback}` : ''}
+    const systemPrompt = `You are ${shark.name}, a tough investor on Shark Tank. ${shark.style}
 
-Keep your response to 2-3 sentences maximum. Be direct and conversational.`;
+You are IN THE TANK right now. This is round ${roundNumber} of a ${mode.name} session.
+
+PERSONALITY RULES:
+- You have a distinct voice. ${selectedShark === 'brutal' ? "You're blunt, impatient, and only care about money. Use short, punchy sentences." : selectedShark === 'analytical' ? "You speak precisely, reference specific numbers, and ask for data points." : selectedShark === 'emotional' ? "You connect on a human level first, but you're not a pushover. You want to feel their passion." : selectedShark === 'skeptic' ? "You play devil's advocate on everything. You poke holes. You challenge assumptions." : "You geek out on product details, tech moats, and scalability."}
+- React specifically to what they JUST said — quote or reference their words
+- If they were vague, call it out. If they said something compelling, acknowledge it briefly then push harder
+- Ask ONE follow-up question that goes deeper, not broader
+- 2-3 sentences max. Sound like a real person talking, not a template.
+
+NEVER mention presentation skills, body language, eye contact, or how they're speaking. ONLY discuss their business.
+DO NOT show thinking. Just respond in character.`;
 
     try {
       setStatus("THINKING...");
       const response = await fetch("https://api.featherless.ai/v1/chat/completions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${FEATHERLESS_API_KEY}`
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${FEATHERLESS_API_KEY}` },
         body: JSON.stringify({
           model: LLM_MODEL,
           messages: [
             { role: 'system', content: systemPrompt },
-            ...updatedMessages.slice(-4).map(m => ({ role: m.role, content: m.content }))
+            ...updatedMessages.slice(-6).map(m => ({ role: m.role, content: m.content }))
           ],
-          max_tokens: 200, // Allow longer responses
-          temperature: 0.8
+          max_tokens: 200,
+          temperature: 0.9
         })
       });
       const data = await response.json();
-      
-      if (!data.choices?.[0]) {
-        throw new Error("No response from AI");
-      }
-      
+      if (!data.choices?.[0]) throw new Error("No response");
       let aiText = data.choices[0].message?.content || '';
-      
-      // CRITICAL: Extract actual text from thinking blocks
-      // DeepSeek returns thinking in <think> tags - we need the actual response
-      if (aiText.includes('<think>')) {
-        const parts = aiText.split('</think>');
-        aiText = parts.length > 1 ? parts[1].trim() : aiText;
-      }
-      
-      // Clean up any markdown artifacts
-      aiText = aiText.replace(/```[\s\S]*?```/g, ''); // Remove code blocks
-      aiText = aiText.replace(/\*\*/g, '').replace(/\*/g, ''); // Remove markdown bold/italic
-      aiText = aiText.trim();
-      
-      // If we get nothing, provide fallback
-      if (!aiText || aiText.length < 5) {
-        aiText = "Tell me more about your business model.";
-      }
-      
+      if (aiText.includes('</think>')) aiText = aiText.split('</think>')[1]?.trim() || aiText;
+      aiText = aiText.replace(/<think>[\s\S]*$/g, '').replace(/```[\s\S]*?```/g, '').replace(/\*\*/g, '').replace(/\*/g, '').trim();
+      if (!aiText || aiText.length < 5) aiText = "Interesting. But what's your actual revenue right now?";
       setMessages(prev => [...prev, { role: 'assistant', content: aiText }]);
       setStatus("YOUR TURN");
       speak(aiText, shark.voice, shark.speed);
       setRoundNumber(prev => prev + 1);
     } catch (e) {
       console.error("AI Error:", e);
-      setStatus("AI ERROR: " + e.message);
-      const fallbackText = "Tell me more about your business.";
-      setMessages(prev => [...prev, { role: 'assistant', content: fallbackText }]);
-      speak(fallbackText, shark.voice, shark.speed);
-    } finally {
-      setLoading(false);
-    }
+      setStatus("AI ERROR");
+      const fallback = "Tell me more about your business model.";
+      setMessages(prev => [...prev, { role: 'assistant', content: fallback }]);
+      speak(fallback, shark.voice, shark.speed);
+    } finally { setLoading(false); }
   };
 
-  const startSession = () => {
+  const startSession = (e) => {
+    if (e?.preventDefault) { e.preventDefault(); e.stopPropagation(); }
     if (!selectedShark || !selectedMode) return;
     const openingLines = {
-      brutal: "60 seconds. Go.",
-      analytical: "Show me your numbers.",
-      emotional: "Why does this matter?",
-      skeptic: "This won't work. Prove me wrong.",
-      technical: "What's your moat?"
+      brutal: "You've got 60 seconds. Don't waste my time.",
+      analytical: "Walk me through your unit economics.",
+      emotional: "Before the numbers — tell me why you started this.",
+      skeptic: "I've seen a hundred pitches like this. Why is yours different?",
+      technical: "What's your technical moat? And don't say 'AI'."
     };
     const opening = openingLines[selectedShark] || "Pitch me.";
     setMessages([{ role: 'assistant', content: opening }]);
-    setSessionMetrics({
-      fillerWords: 0,
-      totalWords: 0,
-      clarityScore: 0,
-      confidenceScore: 0,
-      eyeContactScore: 0,
-      postureScore: 0,
-      rounds: 0
-    });
-    setCurrentEyeContact(0);
-    setCurrentPosture(0);
-    setVisualSamples([]);
-    setVisualFeedback('');
-    setEyeContactVariance(0);
-    setRoundNumber(1);
+    setSessionMetrics({ fillerWords: 0, totalWords: 0, clarityScore: 0, confidenceScore: 0, eyeContactScore: 0, postureScore: 0, rounds: 0 });
+    setCurrentEyeContact(0); setCurrentPosture(0); setVisualSamples([]); setVisualFeedback(''); setEyeContactVariance(0); setRoundNumber(1);
     setScreen('pitch');
     const mode = MODES[selectedMode];
     if (mode.duration) {
       setTimeRemaining(mode.duration);
       timerRef.current = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            endSession();
-            return 0;
-          }
-          return prev - 1;
-        });
+        setTimeRemaining(prev => { if (prev <= 1) { clearInterval(timerRef.current); endSession(); return 0; } return prev - 1; });
       }, 1000);
     }
-    const shark = SHARKS[selectedShark];
-    setTimeout(() => speak(opening, shark.voice, shark.speed), 300);
+    setTimeout(() => speak(opening, SHARKS[selectedShark].voice, SHARKS[selectedShark].speed), 300);
   };
 
   const endSession = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
     stopAudio();
-    const insights = await generateVisualInsights();
+    setStatus("GENERATING ANALYSIS...");
+    const insights = await generateAIAnalysis();
     setVisualFeedback(insights);
     setScreen('analysis');
   };
@@ -941,217 +731,289 @@ Keep your response to 2-3 sentences maximum. Be direct and conversational.`;
   const resetToHome = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     stopAudio();
-    setScreen('home');
-    setSelectedShark(null);
-    setSelectedMode(null);
-    setMessages([]);
-    setTimeRemaining(null);
-    setRoundNumber(1);
-    setVisualSamples([]);
-    setVisualFeedback('');
-    setEyeContactVariance(0);
+    setScreen('home'); setSelectedShark(null); setSelectedMode(null); setMessages([]); setTimeRemaining(null); setRoundNumber(1); setVisualSamples([]); setVisualFeedback(''); setEyeContactVariance(0);
   };
 
   const formatTime = (seconds) => {
     if (seconds === null || seconds === undefined) return '--:--';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
   };
 
   const getScoreColor = (score) => {
-    if (score >= 80) return '#00FF41';
-    if (score >= 50) return '#FFAA00';
-    return '#FF4444';
+    if (score >= 80) return '#34D399';
+    if (score >= 60) return C.accent;
+    if (score >= 40) return '#FBBF24';
+    return '#F87171';
   };
 
+  const getScoreGrade = (score) => {
+    if (score >= 90) return 'A+';
+    if (score >= 80) return 'A';
+    if (score >= 70) return 'B+';
+    if (score >= 60) return 'B';
+    if (score >= 50) return 'C+';
+    if (score >= 40) return 'C';
+    return 'D';
+  };
+
+  // ==================== SCREENS ====================
+
   const renderHome = () => (
-    <ScrollView style={styles.screenContainer} contentContainerStyle={styles.homeContent}>
-      <View style={styles.heroSection}>
-        <Text style={styles.heroEmoji}>🦈</Text>
-        <Text style={styles.heroTitle}>PITCH ARENA</Text>
-        <Text style={styles.heroSubtitle}>Practice pitching with AI investors</Text>
+    <FluidUI screen="home">
+      <View style={styles.screenContainer}>
+        <View style={styles.homeCentered}>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoIcon}></Text>
+            <Text style={styles.heroTitle}>Pitch Arena</Text>
+            <Text style={styles.heroSubtitle}>Train with AI investors. Sharpen your pitch.{'\n'}Get brutally honest feedback.</Text>
+          </View>
+
+          <TouchableOpacity style={styles.primaryBtn} onPress={() => setScreen('setup')} activeOpacity={0.8}>
+            <Text style={styles.primaryBtnText}>Start Practice Session</Text>
+            <Text style={styles.primaryBtnArrow}>→</Text>
+          </TouchableOpacity>
+
+          <View style={styles.featureRow}>
+            <View style={styles.featureChip}>
+              <Text style={styles.featureEmoji}>🎤</Text>
+              <Text style={styles.featureText}>Voice Analysis</Text>
+            </View>
+            <View style={styles.featureChip}>
+              <Text style={styles.featureEmoji}>👁️</Text>
+              <Text style={styles.featureText}>Eye Tracking</Text>
+            </View>
+            <View style={styles.featureChip}>
+              <Text style={styles.featureEmoji}>📊</Text>
+              <Text style={styles.featureText}>AI Coaching</Text>
+            </View>
+          </View>
+
+          <View style={styles.tipsCard}>
+            <Text style={styles.tipsTitle}>Before you begin</Text>
+            <Text style={styles.tipText}>
+              Eliminate filler words — every "um" costs you credibility. Maintain eye contact with the camera. Know your numbers cold. Keep your posture confident and open.
+            </Text>
+          </View>
+        </View>
       </View>
-      <TouchableOpacity style={styles.startButton} onPress={() => setScreen('setup')}>
-        <Text style={styles.startButtonText}>START PRACTICE</Text>
-      </TouchableOpacity>
-      <View style={styles.tipsCard}>
-        <Text style={styles.tipsTitle}>💡 QUICK TIPS</Text>
-        <Text style={styles.tipItem}>• Eliminate filler words (um, uh, like)</Text>
-        <Text style={styles.tipItem}>• Maintain eye contact with camera</Text>
-        <Text style={styles.tipItem}>• Keep good posture - shoulders back</Text>
-        <Text style={styles.tipItem}>• Know your numbers cold</Text>
-      </View>
-    </ScrollView>
+    </FluidUI>
   );
 
   const renderSetup = () => (
-    <ScrollView style={styles.screenContainer} contentContainerStyle={styles.setupContent}>
-      <TouchableOpacity style={styles.backBtn} onPress={() => setScreen('home')}>
-        <Text style={styles.backBtnText}>← Back</Text>
-      </TouchableOpacity>
-      <Text style={styles.setupTitle}>CHOOSE YOUR CHALLENGE</Text>
-      <View style={styles.setupSection}>
-        <Text style={styles.sectionTitle}>🦈 SELECT SHARK</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sharkScroll}>
-          {Object.entries(SHARKS).map(([key, shark]) => (
-            <TouchableOpacity
-              key={key}
-              style={[styles.sharkCard, selectedShark === key && {borderColor: shark.color, borderWidth: 3}]}
-              onPress={() => setSelectedShark(key)}
-            >
-              <Text style={styles.sharkEmoji}>{shark.emoji}</Text>
-              <Text style={styles.sharkName}>{shark.name}</Text>
-              <Text style={styles.sharkStyle} numberOfLines={3}>{shark.style}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-      <View style={styles.setupSection}>
-        <Text style={styles.sectionTitle}>🎯 SELECT MODE</Text>
-        {Object.entries(MODES).map(([key, mode]) => (
+    <FluidUI screen="setup">
+      <ScrollView style={styles.screenContainer} contentContainerStyle={styles.setupContent} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => setScreen('home')}>
+          <Text style={styles.backBtnText}>← Back</Text>
+        </TouchableOpacity>
+
+        <View style={styles.setupHeader}>
+          <Text style={styles.setupTitle}>Configure Session</Text>
+          <Text style={styles.setupSubtitle}>Choose your investor and practice mode</Text>
+        </View>
+
+        {/* Investor Selection - Centered Grid */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>INVESTOR</Text>
+          <View style={styles.sharkGrid}>
+            {Object.entries(SHARKS).map(([key, shark]) => (
+              <TouchableOpacity
+                key={key}
+                style={[styles.sharkCard, selectedShark === key && { borderColor: shark.color, borderWidth: 2, backgroundColor: shark.color + '12' }]}
+                onPress={() => setSelectedShark(key)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.sharkEmoji}>{shark.emoji}</Text>
+                <Text style={styles.sharkName}>{shark.name}</Text>
+                <Text style={styles.sharkStyle} numberOfLines={2}>{shark.style.split('.')[0]}.</Text>
+                {selectedShark === key && <View style={[styles.selectedDot, { backgroundColor: shark.color }]} />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Mode Selection - Centered */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>MODE</Text>
+          <View style={styles.modeGrid}>
+            {Object.entries(MODES).map(([key, mode]) => (
+              <TouchableOpacity
+                key={key}
+                style={[styles.modeCard, selectedMode === key && styles.modeCardSelected]}
+                onPress={() => setSelectedMode(key)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modeIcon}>{mode.icon}</Text>
+                <View style={styles.modeInfo}>
+                  <Text style={styles.modeName}>{mode.name}</Text>
+                  <Text style={styles.modeDesc}>{mode.description}</Text>
+                </View>
+                {selectedMode === key && <View style={styles.modeCheck}><Text style={styles.modeCheckText}>✓</Text></View>}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Begin Button */}
+        <View style={styles.beginContainer}>
           <TouchableOpacity
-            key={key}
-            style={[styles.modeCard, selectedMode === key && styles.modeCardSelected]}
-            onPress={() => setSelectedMode(key)}
+            style={[styles.beginButton, (!selectedShark || !selectedMode) && styles.beginButtonDisabled]}
+            onPress={() => startSession()}
+            disabled={!selectedShark || !selectedMode}
+            activeOpacity={0.8}
           >
-            <Text style={styles.modeIcon}>{mode.icon}</Text>
-            <View style={styles.modeInfo}>
-              <Text style={styles.modeName}>{mode.name}</Text>
-              <Text style={styles.modeDesc}>{mode.description}</Text>
-            </View>
-            {selectedMode === key && <Text style={styles.checkmark}>✓</Text>}
+            <Text style={styles.beginButtonText}>
+              {!selectedShark ? 'Select an investor above' : !selectedMode ? 'Select a mode above' : 'Enter the Tank →'}
+            </Text>
           </TouchableOpacity>
-        ))}
-      </View>
-      <TouchableOpacity
-        style={[styles.beginButton, (!selectedShark || !selectedMode) && styles.beginButtonDisabled]}
-        onPress={startSession}
-        disabled={!selectedShark || !selectedMode}
-      >
-        <Text style={styles.beginButtonText}>
-          {!selectedShark ? 'CHOOSE A SHARK ↑' : !selectedMode ? 'CHOOSE A MODE ↑' : 'BEGIN SESSION'}
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+        </View>
+      </ScrollView>
+    </FluidUI>
   );
 
   const renderPitch = () => (
-    <View style={styles.pitchContainer}>
-      <View style={styles.pitchHeader}>
-        <MediapipeWeb style={styles.miniCamera} onMetrics={onMediapipeMetrics} />
-        <View style={styles.headerOverlay}>
-          <View style={styles.timerContainer}>
-            <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
-            <Text style={styles.roundLabel}>ROUND {roundNumber}</Text>
+    <FluidUI screen="pitch">
+      <View style={styles.pitchContainer}>
+        {/* Top section: Camera + Avatar side by side */}
+        <View style={styles.pitchTop}>
+          <View style={styles.cameraWrapper}>
+            <MediapipeWeb style={styles.cameraFeed} onMetrics={onMediapipeMetrics} />
+            <View style={styles.cameraOverlay}>
+              <View style={styles.timerPill}>
+                <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
+              </View>
+              <View style={styles.roundPill}>
+                <Text style={styles.roundText}>R{roundNumber}</Text>
+              </View>
+            </View>
           </View>
           <AnimatedAvatar isSpeaking={isSpeaking} />
         </View>
-      </View>
-      <View style={styles.metricsBar}>
-        <View style={styles.metricTiny}>
-          <Text style={styles.metricTinyLabel}>CLARITY</Text>
-          <Text style={[styles.metricTinyVal, {color: getScoreColor(sessionMetrics.clarityScore)}]}>
-            {sessionMetrics.clarityScore}%
-          </Text>
+
+        {/* Metrics strip */}
+        <View style={styles.metricsStrip}>
+          {[
+            { label: 'Clarity', value: sessionMetrics.clarityScore },
+            { label: 'Posture', value: currentPosture },
+            { label: 'Eye Contact', value: currentEyeContact },
+          ].map((m, i) => (
+            <View key={i} style={styles.metricItem}>
+              <Text style={styles.metricLabel}>{m.label}</Text>
+              <Text style={[styles.metricValue, { color: getScoreColor(m.value) }]}>{m.value}%</Text>
+            </View>
+          ))}
         </View>
-        <View style={styles.metricTiny}>
-          <Text style={styles.metricTinyLabel}>POSTURE</Text>
-          <Text style={[styles.metricTinyVal, {color: getScoreColor(currentPosture)}]}>
-            {currentPosture}%
-          </Text>
-        </View>
-        <View style={styles.metricTiny}>
-          <Text style={styles.metricTinyLabel}>EYE CONTACT</Text>
-          <Text style={[styles.metricTinyVal, {color: getScoreColor(currentEyeContact)}]}>
-            {currentEyeContact}%
-          </Text>
-        </View>
-        <View style={styles.metricTiny}>
-          <Text style={styles.metricTinyLabel}>SAMPLES</Text>
-          <Text style={styles.metricTinyVal}>{visualSamples.length}</Text>
-        </View>
-      </View>
-      <ScrollView
-        ref={scrollViewRef}
-        style={styles.pitchChat}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
-      >
-        {messages.map((m, i) => (
-          <View key={i} style={[styles.messageBubble, m.role === 'user' ? styles.userBubble : styles.sharkBubble]}>
-            <Text style={styles.messageText}>{m.content}</Text>
-          </View>
-        ))}
-        {loading && <ActivityIndicator color="#00FF41" style={{ marginVertical: 10 }} />}
-      </ScrollView>
-      <View style={styles.pitchFooter}>
-        <TouchableOpacity style={styles.endSessionBtn} onPress={endSession}>
-          <Text style={styles.endBtnText}>END</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.mainMicBtn, isRecording && styles.micActive]}
-          onPressIn={startRecording}
-          onPressOut={stopAndProcess}
-          disabled={loading}
+
+        {/* Chat */}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.chatArea}
+          contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 20 }}
+          onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
         >
-          <Text style={styles.micIcon}>{isRecording ? '⏹️' : '🎤'}</Text>
-          <Text style={styles.micHint}>{isRecording ? 'RELEASE' : 'HOLD TO TALK'}</Text>
-        </TouchableOpacity>
-        <View style={styles.footerSpacer} />
+          {messages.map((m, i) => (
+            <View key={i} style={[styles.bubble, m.role === 'user' ? styles.userBubble : styles.aiBubble]}>
+              {m.role === 'assistant' && <Text style={styles.bubbleSender}>{SHARKS[selectedShark]?.name}</Text>}
+              <Text style={styles.bubbleText}>{m.content}</Text>
+            </View>
+          ))}
+          {loading && <ActivityIndicator color={C.primary} style={{ marginVertical: 16 }} />}
+        </ScrollView>
+
+        {/* Footer */}
+        <View style={styles.pitchFooter}>
+          <TouchableOpacity style={styles.endBtn} onPress={endSession} activeOpacity={0.7}>
+            <Text style={styles.endBtnText}>End</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.micBtn, isRecording && styles.micBtnActive]}
+            onPressIn={startRecording}
+            onPressOut={stopAndProcess}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.micEmoji}>{isRecording ? '⏹' : '🎤'}</Text>
+            <Text style={styles.micLabel}>{isRecording ? 'Release' : 'Hold to talk'}</Text>
+          </TouchableOpacity>
+          <View style={{ width: 56 }} />
+        </View>
       </View>
-    </View>
+    </FluidUI>
   );
 
-  const renderAnalysis = () => (
-    <ScrollView style={styles.screenContainer} contentContainerStyle={styles.analysisContent}>
-      <Text style={styles.analysisTitle}>SESSION COMPLETE</Text>
-      <View style={styles.scoreGrid}>
-        <View style={styles.scoreBox}>
-          <Text style={styles.scoreLabel}>CLARITY</Text>
-          <Text style={[styles.scoreValue, {color: getScoreColor(sessionMetrics.clarityScore)}]}>
-            {sessionMetrics.clarityScore}%
-          </Text>
-        </View>
-        <View style={styles.scoreBox}>
-          <Text style={styles.scoreLabel}>CONFIDENCE</Text>
-          <Text style={[styles.scoreValue, {color: getScoreColor(sessionMetrics.confidenceScore)}]}>
-            {sessionMetrics.confidenceScore}%
-          </Text>
-        </View>
-      </View>
-      <View style={styles.scoreGrid}>
-        <View style={styles.scoreBox}>
-          <Text style={styles.scoreLabel}>EYE CONTACT</Text>
-          <Text style={[styles.scoreValue, {color: getScoreColor(sessionMetrics.eyeContactScore)}]}>
-            {sessionMetrics.eyeContactScore}%
-          </Text>
-        </View>
-        <View style={styles.scoreBox}>
-          <Text style={styles.scoreLabel}>POSTURE</Text>
-          <Text style={[styles.scoreValue, {color: getScoreColor(sessionMetrics.postureScore)}]}>
-            {sessionMetrics.postureScore}%
-          </Text>
-        </View>
-      </View>
-      <View style={styles.statCard}>
-        <Text style={styles.statCardTitle}>SESSION STATS</Text>
-        <Text style={styles.statLine}>Words Spoken: {sessionMetrics.totalWords}</Text>
-        <Text style={styles.statLine}>Filler Words: {sessionMetrics.fillerWords}</Text>
-        <Text style={styles.statLine}>Rounds: {sessionMetrics.rounds}</Text>
-        <Text style={styles.statLine}>Visual Samples: {visualSamples.length}</Text>
-      </View>
-      {visualFeedback && (
-        <View style={styles.feedbackCard}>
-          <Text style={styles.feedbackTitle}>🎯 PERFORMANCE ANALYSIS</Text>
-          <Text style={styles.feedbackText}>{visualFeedback}</Text>
-        </View>
-      )}
-      <TouchableOpacity style={styles.doneBtn} onPress={resetToHome}>
-        <Text style={styles.doneBtnText}>BACK TO ARENA</Text>
-      </TouchableOpacity>
-    </ScrollView>
-  );
+  const renderAnalysis = () => {
+    const overallScore = Math.round(
+      (sessionMetrics.clarityScore * 0.25 + sessionMetrics.confidenceScore * 0.25 +
+       sessionMetrics.eyeContactScore * 0.25 + sessionMetrics.postureScore * 0.25)
+    );
+
+    return (
+      <FluidUI screen="analysis">
+        <ScrollView style={styles.screenContainer} contentContainerStyle={styles.analysisContent} showsVerticalScrollIndicator={false}>
+          {/* Overall Score */}
+          <View style={styles.overallScoreContainer}>
+            <Text style={styles.analysisTitle}>Session Complete</Text>
+            <View style={[styles.overallScoreCircle, { borderColor: getScoreColor(overallScore) }]}>
+              <Text style={[styles.overallGrade, { color: getScoreColor(overallScore) }]}>{getScoreGrade(overallScore)}</Text>
+              <Text style={styles.overallScoreNum}>{overallScore}%</Text>
+            </View>
+            <Text style={styles.overallLabel}>Overall Performance</Text>
+          </View>
+
+          {/* Score Cards - 2x2 Grid */}
+          <View style={styles.scoreRow}>
+            {[
+              { label: 'Clarity', value: sessionMetrics.clarityScore },
+              { label: 'Confidence', value: sessionMetrics.confidenceScore },
+              { label: 'Eye Contact', value: sessionMetrics.eyeContactScore },
+              { label: 'Posture', value: sessionMetrics.postureScore },
+            ].map((s, i) => (
+              <View key={i} style={styles.scoreCard}>
+                <Text style={styles.scoreCardLabel}>{s.label}</Text>
+                <Text style={[styles.scoreCardValue, { color: getScoreColor(s.value) }]}>{s.value}%</Text>
+                <Text style={[styles.scoreCardGrade, { color: getScoreColor(s.value) }]}>{getScoreGrade(s.value)}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Stats */}
+          <View style={styles.statsCard}>
+            <Text style={styles.statsTitle}>Session Details</Text>
+            <View style={styles.statsGrid}>
+              {[
+                { label: 'Words Spoken', value: sessionMetrics.totalWords },
+                { label: 'Filler Words', value: sessionMetrics.fillerWords },
+                { label: 'Rounds', value: sessionMetrics.rounds },
+                { label: 'Samples', value: visualSamples.length },
+              ].map((s, i) => (
+                <View key={i} style={styles.statItem}>
+                  <Text style={styles.statValue}>{s.value}</Text>
+                  <Text style={styles.statLabel}>{s.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* AI Analysis */}
+          {visualFeedback ? (
+            <View style={styles.analysisCard}>
+              <View style={styles.analysisCardHeader}>
+                <Text style={styles.analysisCardIcon}>🧠</Text>
+                <Text style={styles.analysisCardTitle}>Coach's Analysis</Text>
+              </View>
+              <Text style={styles.analysisText}>{visualFeedback}</Text>
+            </View>
+          ) : null}
+
+          <TouchableOpacity style={styles.primaryBtn} onPress={resetToHome} activeOpacity={0.8}>
+            <Text style={styles.primaryBtnText}>Back to Arena</Text>
+            <Text style={styles.primaryBtnArrow}>→</Text>
+          </TouchableOpacity>
+
+          <View style={{ height: 40 }} />
+        </ScrollView>
+      </FluidUI>
+    );
+  };
 
   switch (screen) {
     case 'setup': return renderSetup();
@@ -1161,110 +1023,660 @@ Keep your response to 2-3 sentences maximum. Be direct and conversational.`;
   }
 }
 
+
+// ==================== STYLES ====================
 const styles = StyleSheet.create({
-  screenContainer: { flex: 1, backgroundColor: '#000' },
-  homeContent: { padding: 20, paddingTop: 60 },
-  heroSection: { alignItems: 'center', marginBottom: 40 },
-  heroEmoji: { fontSize: 80 },
-  heroTitle: { color: '#00FF41', fontSize: 32, fontWeight: '900', letterSpacing: 2 },
-  heroSubtitle: { color: '#888', fontSize: 16, marginTop: 10, textAlign: 'center' },
-  startButton: { backgroundColor: '#00FF41', padding: 20, borderRadius: 15, alignItems: 'center', marginVertical: 20 },
-  startButtonText: { color: '#000', fontWeight: 'bold', fontSize: 18 },
-  tipsCard: { backgroundColor: '#111', padding: 20, borderRadius: 15, marginTop: 20, borderWidth: 1, borderColor: '#222' },
-  tipsTitle: { color: '#00FF41', fontSize: 14, fontWeight: 'bold', marginBottom: 15 },
-  tipItem: { color: '#888', fontSize: 14, marginBottom: 8 },
-  setupContent: { padding: 20, paddingTop: 40 },
-  backBtn: { marginBottom: 20 },
-  backBtnText: { color: '#00FF41', fontSize: 16 },
-  setupTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginBottom: 30 },
-  setupSection: { marginBottom: 30 },
-  sectionTitle: { color: '#00FF41', fontSize: 14, fontWeight: 'bold', marginBottom: 15 },
-  sharkScroll: { marginBottom: 10 },
-  sharkCard: { width: 140, backgroundColor: '#111', borderRadius: 15, padding: 15, marginRight: 15, borderWidth: 1, borderColor: '#222' },
-  sharkEmoji: { fontSize: 30, marginBottom: 5 },
-  sharkName: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  sharkStyle: { color: '#666', fontSize: 11, marginTop: 5 },
-  modeCard: { flexDirection: 'row', backgroundColor: '#111', padding: 15, borderRadius: 12, marginBottom: 10, alignItems: 'center', borderWidth: 1, borderColor: '#222' },
-  modeCardSelected: { borderColor: '#00FF41', backgroundColor: '#00FF4110' },
-  modeIcon: { fontSize: 24, marginRight: 15 },
-  modeInfo: { flex: 1 },
-  modeName: { color: '#fff', fontWeight: 'bold' },
-  modeDesc: { color: '#666', fontSize: 12 },
-  checkmark: { color: '#00FF41', fontSize: 20, fontWeight: 'bold' },
-  beginButton: { backgroundColor: '#00FF41', padding: 20, borderRadius: 15, alignItems: 'center' },
-  beginButtonDisabled: { backgroundColor: '#333' },
-  beginButtonText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
-  pitchContainer: { flex: 1, backgroundColor: '#000' },
-  pitchHeader: { height: 360 },
-  miniCamera: { flex: 1 },
-  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.2)', justifyContent: 'space-between', padding: 15 },
-  timerContainer: { alignSelf: 'flex-start', backgroundColor: 'rgba(0,0,0,0.7)', padding: 10, borderRadius: 8 },
-  timerText: { color: '#FF4444', fontSize: 20, fontWeight: 'bold', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  roundLabel: { color: '#fff', fontSize: 10, textAlign: 'center' },
-  metricsBar: { flexDirection: 'row', backgroundColor: '#111', padding: 10, borderBottomWidth: 1, borderBottomColor: '#222' },
-  metricTiny: { flex: 1, alignItems: 'center' },
-  metricTinyLabel: { color: '#666', fontSize: 8, fontWeight: 'bold' },
-  metricTinyVal: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
-  pitchChat: { flex: 1, padding: 15 },
-  messageBubble: { padding: 15, borderRadius: 20, marginBottom: 15, maxWidth: '85%' },
-  userBubble: { backgroundColor: '#1A1A1A', alignSelf: 'flex-end', borderBottomRightRadius: 2 },
-  sharkBubble: { backgroundColor: '#00FF4110', alignSelf: 'flex-start', borderBottomLeftRadius: 2, borderLeftWidth: 3, borderLeftColor: '#00FF41' },
-  messageText: { color: '#fff', fontSize: 16 },
-  pitchFooter: { height: 120, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, backgroundColor: '#050505' },
-  endSessionBtn: { width: 60 },
-  endBtnText: { color: '#666', fontWeight: 'bold' },
-  mainMicBtn: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#111', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#00FF41' },
-  micActive: { backgroundColor: '#FF4444', borderColor: '#fff' },
-  micIcon: { fontSize: 30 },
-  micHint: { color: '#00FF41', fontSize: 8, marginTop: 4, fontWeight: 'bold' },
-  footerSpacer: { width: 60 },
-  analysisContent: { padding: 20, paddingTop: 60 },
-  analysisTitle: { color: '#00FF41', fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 30 },
-  scoreGrid: { flexDirection: 'row', gap: 15, marginBottom: 15 },
-  scoreBox: { flex: 1, backgroundColor: '#111', padding: 20, borderRadius: 15, alignItems: 'center', borderWidth: 1, borderColor: '#222' },
-  scoreLabel: { color: '#666', fontSize: 12, marginBottom: 10 },
-  scoreValue: { fontSize: 32, fontWeight: 'bold' },
-  statCard: { backgroundColor: '#111', padding: 20, borderRadius: 15, marginTop: 15, marginBottom: 20, borderWidth: 1, borderColor: '#222' },
-  statCardTitle: { color: '#00FF41', fontSize: 14, fontWeight: 'bold', marginBottom: 15 },
-  statLine: { color: '#ccc', fontSize: 16, marginBottom: 8 },
-  feedbackCard: { backgroundColor: '#00FF4110', padding: 20, borderRadius: 15, marginBottom: 30, borderWidth: 2, borderColor: '#00FF41' },
-  feedbackTitle: { color: '#00FF41', fontSize: 14, fontWeight: 'bold', marginBottom: 12 },
-  feedbackText: { color: '#fff', fontSize: 15, lineHeight: 22 },
-  doneBtn: { backgroundColor: '#00FF41', padding: 20, borderRadius: 15, alignItems: 'center' },
-  doneBtnText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
-  
-  // Avatar Styles
-  avatarContainer: {
-    alignSelf: 'flex-end',
+  screenContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+
+  // === HOME ===
+  homeCentered: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: 10,
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
-  avatarImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 48,
   },
-  avatarEmoji: {
-    fontSize: 60,
+  logoIcon: {
+    fontSize: 48,
+    marginBottom: 16,
   },
-  speakingLabel: {
-    color: '#00FF41',
-    fontSize: 8,
-    fontWeight: 'bold',
-    marginTop: 5,
+  heroTitle: {
+    color: C.text,
+    fontSize: 42,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    letterSpacing: -1,
+    marginBottom: 12,
   },
-  speakingIndicator: {
+  heroSubtitle: {
+    color: C.textSecondary,
+    fontSize: 16,
+    fontFamily: FONT.regular,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  primaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 5,
-    gap: 3,
+    backgroundColor: C.primary,
+    paddingVertical: 18,
+    paddingHorizontal: 36,
+    borderRadius: 16,
+    width: '100%',
+    maxWidth: 400,
+    marginBottom: 32,
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 8,
   },
-  soundWave: {
-    width: 3,
-    backgroundColor: '#00FF41',
-    borderRadius: 2,
+  primaryBtnText: {
+    color: '#FFF',
+    fontSize: 17,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    letterSpacing: 0.3,
+  },
+  primaryBtnArrow: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+    marginLeft: 10,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 32,
+  },
+  featureChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: C.cardBg,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+  },
+  featureEmoji: {
+    fontSize: 14,
+    marginRight: 6,
+  },
+  featureText: {
+    color: C.textSecondary,
+    fontSize: 13,
+    fontFamily: FONT.medium,
+    fontWeight: '500',
+  },
+  tipsCard: {
+    backgroundColor: C.cardBg,
+    padding: 24,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+    width: '100%',
+    maxWidth: 400,
+  },
+  tipsTitle: {
+    color: C.primaryLight,
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: FONT.medium,
+    marginBottom: 10,
+  },
+  tipText: {
+    color: C.textSecondary,
+    fontSize: 14,
+    fontFamily: FONT.regular,
+    lineHeight: 22,
+  },
+
+  // === SETUP ===
+  setupContent: {
+    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 40,
+    alignItems: 'center',
+  },
+  backBtn: {
+    alignSelf: 'flex-start',
+    marginBottom: 20,
+    paddingVertical: 8,
+  },
+  backBtnText: {
+    color: C.primaryLight,
+    fontSize: 16,
+    fontFamily: FONT.medium,
+    fontWeight: '500',
+  },
+  setupHeader: {
+    alignItems: 'center',
+    marginBottom: 36,
+  },
+  setupTitle: {
+    color: C.text,
+    fontSize: 32,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  setupSubtitle: {
+    color: C.textSecondary,
+    fontSize: 15,
+    fontFamily: FONT.regular,
+  },
+  sectionBlock: {
+    width: '100%',
+    maxWidth: 500,
+    marginBottom: 32,
+  },
+  sectionLabel: {
+    color: C.textMuted,
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    letterSpacing: 1.5,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  sharkGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  sharkCard: {
+    width: width > 500 ? 145 : (width - 72) / 2,
+    backgroundColor: C.cardBg,
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1.5,
+    borderColor: C.cardBorder,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  sharkEmoji: {
+    fontSize: 28,
+    marginBottom: 10,
+  },
+  sharkName: {
+    color: C.text,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    fontSize: 14,
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  sharkStyle: {
+    color: C.textMuted,
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  selectedDot: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  modeGrid: {
+    gap: 10,
+  },
+  modeCard: {
+    flexDirection: 'row',
+    backgroundColor: C.cardBg,
+    padding: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: C.cardBorder,
+  },
+  modeCardSelected: {
+    borderColor: C.primary,
+    backgroundColor: C.primary + '10',
+  },
+  modeIcon: {
+    fontSize: 22,
+    marginRight: 14,
+  },
+  modeInfo: {
+    flex: 1,
+  },
+  modeName: {
+    color: C.text,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    fontSize: 15,
+  },
+  modeDesc: {
+    color: C.textMuted,
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    marginTop: 3,
+  },
+  modeCheck: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: C.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modeCheckText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  beginContainer: {
+    width: '100%',
+    maxWidth: 500,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  beginButton: {
+    backgroundColor: C.primary,
+    paddingVertical: 18,
+    paddingHorizontal: 36,
+    borderRadius: 16,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  beginButtonDisabled: {
+    backgroundColor: C.slateBlue,
+    shadowOpacity: 0,
+  },
+  beginButtonText: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    fontSize: 16,
+    letterSpacing: 0.3,
+  },
+
+  // === PITCH ===
+  pitchContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  pitchTop: {
+    flexDirection: 'row',
+    height: 280,
+    padding: 12,
+    gap: 12,
+  },
+  cameraWrapper: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    position: 'relative',
+  },
+  cameraFeed: {
+    flex: 1,
+    borderRadius: 16,
+  },
+  cameraOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  timerPill: {
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.primary + '50',
+  },
+  timerText: {
+    color: C.primaryLight,
+    fontSize: 18,
+    fontWeight: '700',
+    fontFamily: FONT.mono,
+  },
+  roundPill: {
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+  },
+  roundText: {
+    color: C.textSecondary,
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: FONT.mono,
+  },
+  metricsStrip: {
+    flexDirection: 'row',
+    backgroundColor: C.surface,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: C.cardBorder,
+  },
+  metricItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  metricLabel: {
+    color: C.textMuted,
+    fontSize: 10,
+    fontWeight: '600',
+    fontFamily: FONT.medium,
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  metricValue: {
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+  },
+  chatArea: {
+    flex: 1,
+  },
+  bubble: {
+    padding: 16,
+    borderRadius: 18,
+    marginBottom: 12,
+    maxWidth: '82%',
+  },
+  userBubble: {
+    backgroundColor: C.primary + '20',
+    alignSelf: 'flex-end',
+    borderBottomRightRadius: 4,
+    borderWidth: 1,
+    borderColor: C.primary + '30',
+  },
+  aiBubble: {
+    backgroundColor: C.cardBg,
+    alignSelf: 'flex-start',
+    borderBottomLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+  },
+  bubbleSender: {
+    color: C.primaryLight,
+    fontSize: 11,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  bubbleText: {
+    color: C.text,
+    fontSize: 15,
+    fontFamily: FONT.regular,
+    lineHeight: 22,
+  },
+  pitchFooter: {
+    height: 110,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    backgroundColor: C.surface,
+    borderTopWidth: 1,
+    borderTopColor: C.cardBorder,
+  },
+  endBtn: {
+    width: 56,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  endBtnText: {
+    color: '#F87171',
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    fontSize: 13,
+  },
+  micBtn: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: C.cardBg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2.5,
+    borderColor: C.primary,
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  micBtnActive: {
+    backgroundColor: C.primary + '25',
+    borderColor: '#34D399',
+    shadowColor: '#34D399',
+  },
+  micEmoji: {
+    fontSize: 28,
+  },
+  micLabel: {
+    color: C.textMuted,
+    fontSize: 9,
+    fontWeight: '600',
+    fontFamily: FONT.medium,
+    marginTop: 3,
+  },
+
+  // === AVATAR ===
+  avatarContainer: {
+    width: 130,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: C.cardBg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+    padding: 12,
+    position: 'relative',
+  },
+  avatarGlow: {
+    position: 'absolute',
+    top: -10,
+    left: -10,
+    right: -10,
+    bottom: -10,
+    borderRadius: 26,
+    backgroundColor: C.primary,
+    ...(Platform.OS === 'web' ? { filter: 'blur(20px)' } : {}),
+  },
+  avatarImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+  },
+  speakingPill: {
+    marginTop: 8,
+    backgroundColor: C.primary + '30',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  speakingLabel: {
+    color: C.primaryLight,
+    fontSize: 9,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    letterSpacing: 1,
+  },
+
+  // === ANALYSIS ===
+  analysisContent: {
+    paddingHorizontal: 24,
+    paddingTop: 50,
+    alignItems: 'center',
+  },
+  overallScoreContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  analysisTitle: {
+    color: C.text,
+    fontSize: 28,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    letterSpacing: -0.5,
+    marginBottom: 24,
+  },
+  overallScoreCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: C.cardBg,
+    marginBottom: 12,
+  },
+  overallGrade: {
+    fontSize: 32,
+    fontWeight: '900',
+    fontFamily: FONT.bold,
+  },
+  overallScoreNum: {
+    color: C.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: FONT.medium,
+  },
+  overallLabel: {
+    color: C.textMuted,
+    fontSize: 14,
+    fontFamily: FONT.regular,
+  },
+  scoreRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 20,
+    width: '100%',
+    maxWidth: 500,
+  },
+  scoreCard: {
+    width: (width > 500 ? 500 : width - 60) / 2 - 6,
+    backgroundColor: C.cardBg,
+    padding: 20,
+    borderRadius: 18,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+  },
+  scoreCardLabel: {
+    color: C.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    fontFamily: FONT.medium,
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  scoreCardValue: {
+    fontSize: 28,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+  },
+  scoreCardGrade: {
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    marginTop: 4,
+  },
+  statsCard: {
+    backgroundColor: C.cardBg,
+    padding: 24,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: C.cardBorder,
+    width: '100%',
+    maxWidth: 500,
+    marginBottom: 20,
+  },
+  statsTitle: {
+    color: C.primaryLight,
+    fontSize: 14,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    letterSpacing: 0.5,
+    marginBottom: 16,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    color: C.text,
+    fontSize: 22,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+  },
+  statLabel: {
+    color: C.textMuted,
+    fontSize: 11,
+    fontFamily: FONT.regular,
+    marginTop: 4,
+  },
+  analysisCard: {
+    backgroundColor: C.primary + '0A',
+    padding: 24,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: C.primary + '30',
+    width: '100%',
+    maxWidth: 500,
+    marginBottom: 28,
+  },
+  analysisCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  analysisCardIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  analysisCardTitle: {
+    color: C.primaryLight,
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: FONT.bold,
+    letterSpacing: 0.3,
+  },
+  analysisText: {
+    color: C.text,
+    fontSize: 15,
+    fontFamily: FONT.regular,
+    lineHeight: 24,
   },
 });
