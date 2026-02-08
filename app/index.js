@@ -16,12 +16,13 @@ import {
 } from 'react-native';
 import FluidUI from './FluidUI';
 
-
 // --- CONFIGURATION ---
+// ⚠️ IMPORTANT: Replace these with your actual API keys
 const FEATHERLESS_API_KEY = 'rc_1a19fe2efea58e9740fa15291133f16d8c2c3238a179a48e566250e032251fbc';
 const DEEPGRAM_API_KEY = '64c0fd8f103661e12ce9ac9695b8b1588f14570a';
-const ELEVENLABS_API_KEY = 'sk_01b7bd3fb09ba0e2a2fefb609901d9609c8b6c77e366ae5f';
+const ELEVENLABS_API_KEY = 'sk_01b7bd3fb09ba0e2a2fefb609901d9609c8b6c77e366ae5f'; // <--- ADD THIS
 const LLM_MODEL = "deepseek-ai/DeepSeek-R1-0528";
+
 const { width, height } = Dimensions.get('window');
 
 // Premium font family
@@ -33,7 +34,7 @@ const FONT = {
   mono: Platform.select({ ios: 'Menlo', android: 'monospace', web: "'JetBrains Mono', 'SF Mono', monospace" }),
 };
 
-// Warmer palette
+// Color palette
 const C = {
   primary: '#6366F1',
   primaryLight: '#818CF8',
@@ -53,7 +54,6 @@ const C = {
   glow: '#7DD3FC',
 };
 
-
 // --- VOICE IDs (ElevenLabs voices) ---
 const VOICES = {
   brutal: 'pNInz6obpgDQGcFmaJgB',
@@ -63,65 +63,90 @@ const VOICES = {
   technical: 'onwK4e9ZLuTAKqWW03F9',
 };
 
-
 // --- AVATAR CONFIGURATION ---
 const AVATAR_TALKING = { uri: 'https://media1.tenor.com/m/trBThsE-oHAAAAAd/pengu-pudgy.gif' };
 const AVATAR_IDLE = { uri: "https://media1.tenor.com/m/FDQQBo83UMIAAAAd/xylophone-music.gif" };
 
-
-// --- SHARK PERSONALITIES ---
+// --- SHARK PERSONALITIES (Refined) ---
 const SHARKS = {
   brutal: {
     name: "Mr. Ruthless",
-    emoji: "🦈",
+    icon: "⚡",
     voice: VOICES.brutal,
     style: "Extremely harsh, focuses on numbers and ROI. Will tear apart any weakness.",
     color: "#EF4444",
-    speed: 1.2
+    speed: 1.2,
+    gradient: ['#EF4444', '#DC2626']
   },
   analytical: {
     name: "The Calculator",
-    emoji: "📊",
+    icon: "📊",
     voice: VOICES.analytical,
     style: "Data-driven, asks probing questions about metrics and unit economics.",
     color: "#3B82F6",
-    speed: 1.0
+    speed: 1.0,
+    gradient: ['#3B82F6', '#2563EB']
   },
   emotional: {
     name: "Heart & Hustle",
-    emoji: "💜",
+    icon: "💜",
     voice: VOICES.emotional,
     style: "Focuses on founder story and passion. Wants to feel the WHY.",
     color: "#A78BFA",
-    speed: 0.9
+    speed: 0.9,
+    gradient: ['#A78BFA', '#8B5CF6']
   },
   skeptic: {
     name: "The Doubter",
-    emoji: "🤨",
+    icon: "⚠",
     voice: VOICES.skeptic,
     style: "Questions everything. Tests your conviction relentlessly.",
     color: "#F59E0B",
-    speed: 1.1
+    speed: 1.1,
+    gradient: ['#F59E0B', '#D97706']
   },
   technical: {
     name: "Tech Titan",
-    emoji: "⚡",
+    icon: "⚡",
     voice: VOICES.technical,
     style: "Deep dives into product, tech stack, and defensibility.",
     color: "#2DD4BF",
-    speed: 1.0
+    speed: 1.0,
+    gradient: ['#2DD4BF', '#14B8A6']
   }
 };
 
-
-// --- PRACTICE MODES ---
+// --- PRACTICE MODES (Refined) ---
 const MODES = {
-  elevator: { name: "Elevator Pitch", duration: 60, description: "60 seconds to make them remember you", rounds: 3, icon: "⚡" },
-  fullPitch: { name: "Full Pitch", duration: 300, description: "5 minutes to tell your story + Q&A", rounds: 5, icon: "🎯" },
-  qanda: { name: "Rapid Fire Q&A", duration: 180, description: "Tough questions, fast answers", rounds: 8, icon: "🔥" },
-  freestyle: { name: "Freestyle", duration: null, description: "Practice at your own pace", rounds: null, icon: "🎤" }
+  elevator: { 
+    name: "Elevator Pitch", 
+    duration: 60, 
+    description: "60 seconds to make them remember you", 
+    rounds: 3,
+    badge: "QUICK"
+  },
+  fullPitch: { 
+    name: "Full Pitch", 
+    duration: 300, 
+    description: "5 minutes to tell your story + Q&A", 
+    rounds: 5,
+    badge: "DEEP"
+  },
+  qanda: { 
+    name: "Rapid Fire Q&A", 
+    duration: 180, 
+    description: "Tough questions, fast answers", 
+    rounds: 8,
+    badge: "INTENSE"
+  },
+  freestyle: { 
+    name: "Freestyle", 
+    duration: null, 
+    description: "Practice at your own pace", 
+    rounds: null,
+    badge: "FLEX"
+  }
 };
-
 
 // --- ANIMATED AVATAR COMPONENT ---
 function AnimatedAvatar({ isSpeaking }) {
@@ -157,11 +182,7 @@ function AnimatedAvatar({ isSpeaking }) {
     <View style={styles.avatarContainer}>
       <Animated.View style={[styles.avatarGlow, { opacity: glowOpacity }]} />
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-        <Image
-          source={isSpeaking ? AVATAR_TALKING : AVATAR_IDLE}
-          style={styles.avatarImage}
-          resizeMode="contain"
-        />
+        <Image source={isSpeaking ? AVATAR_TALKING : AVATAR_IDLE} style={styles.avatarImage} />
       </Animated.View>
       {isSpeaking && (
         <View style={styles.speakingPill}>
@@ -172,14 +193,13 @@ function AnimatedAvatar({ isSpeaking }) {
   );
 }
 
-
 // --- WEB-ONLY Mediapipe runner ---
 function MediapipeWeb({ onMetrics, style }) {
   const containerRef = useRef(null);
- 
+
   useEffect(() => {
     if (Platform.OS !== 'web') return;
-   
+
     let videoEl;
     let stream;
     let rafId;
@@ -215,7 +235,7 @@ function MediapipeWeb({ onMetrics, style }) {
         } else { checkAllLoaded(); }
       });
     };
-   
+
     const start = async () => {
       try {
         await loadMediapipeScripts();
@@ -308,8 +328,8 @@ function MediapipeWeb({ onMetrics, style }) {
 
   if (Platform.OS !== 'web') {
     return (
-      <View style={[style, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: C.textSecondary, textAlign: 'center', padding: 12, fontFamily: FONT.regular }}>
+      <View style={[style, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }]}>
+        <Text style={{ color: C.textMuted, fontSize: 12, textAlign: 'center', padding: 20 }}>
           Vision analysis available on web. Open in a browser for Mediapipe.
         </Text>
       </View>
@@ -318,7 +338,6 @@ function MediapipeWeb({ onMetrics, style }) {
 
   return <View ref={containerRef} style={style} />;
 }
-
 
 // --- APP ---
 export default function App() {
@@ -353,7 +372,6 @@ export default function App() {
 
   useEffect(() => {
     if (Platform.OS === 'web') {
-      // Inject Inter font
       const link = document.createElement('link');
       link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap';
       link.rel = 'stylesheet';
@@ -434,16 +452,13 @@ export default function App() {
             {
               role: 'system',
               content: `You are an elite pitch coach who has trained founders that raised $500M+ collectively. You give sharp, memorable, actionable feedback that founders actually remember and use.
-
 Your analysis style:
 - Open with a vivid, honest one-line verdict (like "You pitched like someone reading a grocery list" or "That was a founder who knows their numbers cold")
 - Use concrete examples from what they actually said
 - Compare to what great pitches sound like
 - Give exactly 3 specific drills or exercises they can do TODAY
 - End with one sentence of genuine encouragement or a challenge
-
 Write 4-5 paragraphs. Be direct, witty, and constructive. Never be generic. Never use bullet points or headers. Write like you're talking to them over coffee after the session.
-
 The founder practiced in "${modeName}" mode against "${sharkName}".`
             },
             {
@@ -481,7 +496,7 @@ Give your analysis.`
   const generateFallbackAnalysis = (avgEye, avgPosture, avgWords, eyeVar) => {
     const fillerRate = sessionMetrics.totalWords > 0 ? Math.round(sessionMetrics.fillerWords / sessionMetrics.totalWords * 100) : 0;
     const verdict = sessionMetrics.confidenceScore >= 70 ? "You showed real conviction in there — now let's sharpen the edges." : sessionMetrics.confidenceScore >= 40 ? "Decent foundation, but you're leaving persuasion points on the table." : "Honest truth: that pitch needs serious work before it's investor-ready.";
-    
+
     return `${verdict}
 
 Your speech clocked in at ${sessionMetrics.totalWords} words across ${sessionMetrics.rounds} rounds with a ${fillerRate}% filler rate. ${fillerRate > 8 ? "That filler rate is a red flag — every 'um' and 'like' chips away at your credibility. Investors notice this immediately." : fillerRate > 3 ? "Your filler rate is manageable but still noticeable. The best founders speak with clean, deliberate sentences." : "Clean speech — that's a real advantage. You sound like someone who's practiced."} Your clarity score of ${sessionMetrics.clarityScore}% ${sessionMetrics.clarityScore >= 75 ? "shows you can articulate your ideas well" : "suggests your message isn't landing as crisply as it needs to"}.
@@ -571,7 +586,7 @@ ${sessionMetrics.confidenceScore >= 60 ? "You've got the raw material. Now it's 
     if (isRecording || loading) return;
     await stopAudio();
     try {
-      setStatus("LISTENING...");
+      setStatus("LISTENING…");
       if (Platform.OS === 'web') {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mime = 'audio/webm;codecs=opus';
@@ -595,7 +610,7 @@ ${sessionMetrics.confidenceScore >= 60 ? "You've got the raw material. Now it's 
     if (!isRecording || !recordingRef.current) return;
     setIsRecording(false);
     setLoading(true);
-    setStatus("ANALYZING...");
+    setStatus("ANALYZING…");
     try {
       let audioBody, contentType = 'audio/m4a';
       if (Platform.OS === 'web') {
@@ -650,18 +665,30 @@ ${sessionMetrics.confidenceScore >= 60 ? "You've got the raw material. Now it's 
 
 You are IN THE TANK right now. This is round ${roundNumber} of a ${mode.name} session.
 
-PERSONALITY RULES:
-- You have a distinct voice. ${selectedShark === 'brutal' ? "You're blunt, impatient, and only care about money. Use short, punchy sentences." : selectedShark === 'analytical' ? "You speak precisely, reference specific numbers, and ask for data points." : selectedShark === 'emotional' ? "You connect on a human level first, but you're not a pushover. You want to feel their passion." : selectedShark === 'skeptic' ? "You play devil's advocate on everything. You poke holes. You challenge assumptions." : "You geek out on product details, tech moats, and scalability."}
-- React specifically to what they JUST said — quote or reference their words
-- If they were vague, call it out. If they said something compelling, acknowledge it briefly then push harder
-- Ask ONE follow-up question that goes deeper, not broader
-- 2-3 sentences max. Sound like a real person talking, not a template.
+CRITICAL RULES:
+1. NEVER use <think> tags or show your reasoning
+2. Respond ONLY with what you would say out loud to the founder
+3. React specifically to what they JUST said — quote or reference their words
+4. ${selectedShark === 'brutal' ? "Be blunt and impatient. Use short, punchy sentences. Only care about money." : selectedShark === 'analytical' ? "Speak precisely and reference specific numbers. Ask for data points." : selectedShark === 'emotional' ? "Connect on a human level first, but don't be a pushover. Feel their passion." : selectedShark === 'skeptic' ? "Play devil's advocate. Poke holes. Challenge every assumption." : "Geek out on product details, tech moats, and scalability."}
+5. If they were vague, call it out directly
+6. If they said something compelling, acknowledge it briefly then push harder
+7. Ask ONE sharp follow-up question that goes deeper
+8. Keep it to 2-3 sentences max
+9. Sound like a real person talking, not a template
+10. NEVER mention presentation skills, body language, eye contact, or how they're speaking
+11. ONLY discuss their business, product, numbers, market, or strategy
+12. Start speaking immediately - no preamble, no thinking out loud
 
-NEVER mention presentation skills, body language, eye contact, or how they're speaking. ONLY discuss their business.
-DO NOT show thinking. Just respond in character.`;
+Your response should be EXACTLY what you'd say in the tank. Nothing else.`;
 
     try {
       setStatus("THINKING...");
+      
+      // Validate API key
+      if (!FEATHERLESS_API_KEY || FEATHERLESS_API_KEY === 'YOUR_FEATHERLESS_API_KEY_HERE') {
+        throw new Error("Featherless API key not configured");
+      }
+      
       const response = await fetch("https://api.featherless.ai/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${FEATHERLESS_API_KEY}` },
@@ -675,23 +702,83 @@ DO NOT show thinking. Just respond in character.`;
           temperature: 0.9
         })
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error Response:", response.status, errorText);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
-      if (!data.choices?.[0]) throw new Error("No response");
+      if (!data.choices?.[0]) throw new Error("No response from AI");
+      
       let aiText = data.choices[0].message?.content || '';
-      if (aiText.includes('</think>')) aiText = aiText.split('</think>')[1]?.trim() || aiText;
-      aiText = aiText.replace(/<think>[\s\S]*$/g, '').replace(/```[\s\S]*?```/g, '').replace(/\*\*/g, '').replace(/\*/g, '').trim();
-      if (!aiText || aiText.length < 5) aiText = "Interesting. But what's your actual revenue right now?";
+      
+      // Remove thinking tags comprehensively - multiple passes
+      for (let i = 0; i < 3; i++) {
+        aiText = aiText.replace(/<think>[\s\S]*?<\/think>/gi, '');
+        aiText = aiText.replace(/<think>[\s\S]*$/gi, '');
+        aiText = aiText.replace(/^[\s\S]*?<\/think>/gi, '');
+      }
+      
+      // Remove code blocks and markdown
+      aiText = aiText.replace(/```[\s\S]*?```/g, '');
+      aiText = aiText.replace(/\*\*/g, '');
+      aiText = aiText.replace(/\*/g, '');
+      aiText = aiText.replace(/#{1,6}\s/g, '');
+      
+      // Remove any XML-like tags
+      aiText = aiText.replace(/<[^>]+>/g, '');
+      
+      // Clean up whitespace and newlines
+      aiText = aiText.replace(/\n{3,}/g, '\n\n');
+      aiText = aiText.trim();
+      
+      // Remove common AI preambles
+      aiText = aiText.replace(/^(Here's what I would say:|Let me respond:|My response:)/i, '');
+      aiText = aiText.trim();
+      
+      // Validate it's actually dialogue
+      const hasQuestionMark = aiText.includes('?');
+      const hasWords = aiText.split(/\s+/).length >= 3;
+      
+      // Fallback if nothing valid left
+      if (!aiText || aiText.length < 5 || !hasWords) {
+        const fallbacks = [
+          "What's your customer acquisition cost?",
+          "Talk to me about your margins.",
+          "Who are your competitors and why are you better?",
+          "What's your monthly revenue right now?",
+          "How much are you asking for and what's the valuation?"
+        ];
+        aiText = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      }
+      
       setMessages(prev => [...prev, { role: 'assistant', content: aiText }]);
       setStatus("YOUR TURN");
       speak(aiText, shark.voice, shark.speed);
       setRoundNumber(prev => prev + 1);
+      setLoading(false);
     } catch (e) {
       console.error("AI Error:", e);
       setStatus("AI ERROR");
-      const fallback = "Tell me more about your business model.";
+      
+      let errorMessage = "Tell me more about your business model.";
+      
+      // Provide helpful error messages
+      if (e.message.includes("401")) {
+        console.error("❌ Invalid API key. Please check your Featherless API key.");
+        errorMessage = "API configuration error. Check console for details.";
+      } else if (e.message.includes("API key not configured")) {
+        console.error("❌ Please add your Featherless API key to the configuration.");
+        errorMessage = "Please configure your API keys first.";
+      }
+      
+      const fallback = errorMessage;
       setMessages(prev => [...prev, { role: 'assistant', content: fallback }]);
       speak(fallback, shark.voice, shark.speed);
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   };
 
   const startSession = (e) => {
@@ -722,7 +809,7 @@ DO NOT show thinking. Just respond in character.`;
   const endSession = async () => {
     if (timerRef.current) clearInterval(timerRef.current);
     stopAudio();
-    setStatus("GENERATING ANALYSIS...");
+    setStatus("GENERATING ANALYSIS…");
     const insights = await generateAIAnalysis();
     setVisualFeedback(insights);
     setScreen('analysis');
@@ -757,39 +844,46 @@ DO NOT show thinking. Just respond in character.`;
   };
 
   // ==================== SCREENS ====================
-
   const renderHome = () => (
     <FluidUI screen="home">
       <View style={styles.screenContainer}>
         <View style={styles.homeCentered}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logoIcon}></Text>
-            <Text style={styles.heroTitle}>Pitch Arena</Text>
-            <Text style={styles.heroSubtitle}>Train with AI investors. Sharpen your pitch.{'\n'}Get brutally honest feedback.</Text>
+            <View style={styles.logoIconContainer}>
+              <Text style={styles.logoIconText}>PITCH</Text>
+            </View>
+            <Text style={styles.heroTitle}>
+              PITCH <Text style={styles.heroTitleAccent}>ARENA</Text>
+            </Text>
+            <Text style={styles.heroSubtitle}>
+              Train with AI investors. Sharpen your pitch.{'\n'}Get brutally honest feedback.
+            </Text>
           </View>
 
           <TouchableOpacity style={styles.primaryBtn} onPress={() => setScreen('setup')} activeOpacity={0.8}>
             <Text style={styles.primaryBtnText}>Start Practice Session</Text>
-            <Text style={styles.primaryBtnArrow}>→</Text>
+            <View style={styles.primaryBtnArrow}>
+              <Text style={styles.primaryBtnArrowText}>→</Text>
+            </View>
           </TouchableOpacity>
 
           <View style={styles.featureRow}>
             <View style={styles.featureChip}>
-              <Text style={styles.featureEmoji}>🎤</Text>
+              <View style={styles.featureDot} />
               <Text style={styles.featureText}>Voice Analysis</Text>
             </View>
             <View style={styles.featureChip}>
-              <Text style={styles.featureEmoji}>👁️</Text>
+              <View style={styles.featureDot} />
               <Text style={styles.featureText}>Eye Tracking</Text>
             </View>
             <View style={styles.featureChip}>
-              <Text style={styles.featureEmoji}>📊</Text>
+              <View style={styles.featureDot} />
               <Text style={styles.featureText}>AI Coaching</Text>
             </View>
           </View>
 
           <View style={styles.tipsCard}>
-            <Text style={styles.tipsTitle}>Before you begin</Text>
+            <Text style={styles.tipsTitle}>BEFORE YOU BEGIN</Text>
             <Text style={styles.tipText}>
               Eliminate filler words — every "um" costs you credibility. Maintain eye contact with the camera. Know your numbers cold. Keep your posture confident and open.
             </Text>
@@ -803,37 +897,56 @@ DO NOT show thinking. Just respond in character.`;
     <FluidUI screen="setup">
       <ScrollView style={styles.screenContainer} contentContainerStyle={styles.setupContent} showsVerticalScrollIndicator={false}>
         <TouchableOpacity style={styles.backBtn} onPress={() => setScreen('home')}>
-          <Text style={styles.backBtnText}>← Back</Text>
+          <Text style={styles.backBtnText}>← BACK</Text>
         </TouchableOpacity>
 
         <View style={styles.setupHeader}>
-          <Text style={styles.setupTitle}>Configure Session</Text>
+          <Text style={styles.setupTitle}>
+            CONFIGURE <Text style={styles.setupTitleAccent}>SESSION</Text>
+          </Text>
           <Text style={styles.setupSubtitle}>Choose your investor and practice mode</Text>
         </View>
 
-        {/* Investor Selection - Centered Grid */}
+        {/* Investor Selection */}
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>INVESTOR</Text>
+          <Text style={styles.sectionLabel}>SELECT INVESTOR</Text>
           <View style={styles.sharkGrid}>
             {Object.entries(SHARKS).map(([key, shark]) => (
               <TouchableOpacity
                 key={key}
-                style={[styles.sharkCard, selectedShark === key && { borderColor: shark.color, borderWidth: 2, backgroundColor: shark.color + '12' }]}
+                style={[
+                  styles.sharkCard,
+                  selectedShark === key && { 
+                    borderColor: shark.color, 
+                    borderWidth: 2.5, 
+                    backgroundColor: shark.color + '15',
+                    shadowColor: shark.color,
+                    shadowOpacity: 0.4,
+                    shadowRadius: 15,
+                    elevation: 8,
+                  }
+                ]}
                 onPress={() => setSelectedShark(key)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.sharkEmoji}>{shark.emoji}</Text>
-                <Text style={styles.sharkName}>{shark.name}</Text>
+                <View style={[styles.sharkIconBadge, { backgroundColor: shark.color + '25', borderColor: shark.color }]}>
+                  <Text style={styles.sharkIcon}>{shark.icon}</Text>
+                </View>
+                <Text style={[styles.sharkName, selectedShark === key && { color: shark.color }]}>{shark.name}</Text>
                 <Text style={styles.sharkStyle} numberOfLines={2}>{shark.style.split('.')[0]}.</Text>
-                {selectedShark === key && <View style={[styles.selectedDot, { backgroundColor: shark.color }]} />}
+                {selectedShark === key && (
+                  <View style={[styles.selectedBadge, { backgroundColor: shark.color }]}>
+                    <Text style={styles.selectedBadgeText}>SELECTED</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {/* Mode Selection - Centered */}
+        {/* Mode Selection */}
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>MODE</Text>
+          <Text style={styles.sectionLabel}>SELECT MODE</Text>
           <View style={styles.modeGrid}>
             {Object.entries(MODES).map(([key, mode]) => (
               <TouchableOpacity
@@ -842,12 +955,22 @@ DO NOT show thinking. Just respond in character.`;
                 onPress={() => setSelectedMode(key)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.modeIcon}>{mode.icon}</Text>
-                <View style={styles.modeInfo}>
-                  <Text style={styles.modeName}>{mode.name}</Text>
-                  <Text style={styles.modeDesc}>{mode.description}</Text>
+                <View style={styles.modeLeft}>
+                  <View style={[styles.modeBadge, selectedMode === key && styles.modeBadgeActive]}>
+                    <Text style={[styles.modeBadgeText, selectedMode === key && styles.modeBadgeTextActive]}>
+                      {mode.badge}
+                    </Text>
+                  </View>
+                  <View style={styles.modeInfo}>
+                    <Text style={[styles.modeName, selectedMode === key && styles.modeNameActive]}>{mode.name}</Text>
+                    <Text style={styles.modeDesc}>{mode.description}</Text>
+                  </View>
                 </View>
-                {selectedMode === key && <View style={styles.modeCheck}><Text style={styles.modeCheckText}>✓</Text></View>}
+                {selectedMode === key && (
+                  <View style={styles.modeCheckmark}>
+                    <Text style={styles.modeCheckmarkText}>✓</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -862,7 +985,7 @@ DO NOT show thinking. Just respond in character.`;
             activeOpacity={0.8}
           >
             <Text style={styles.beginButtonText}>
-              {!selectedShark ? 'Select an investor above' : !selectedMode ? 'Select a mode above' : 'Enter the Tank →'}
+              {!selectedShark ? 'SELECT AN INVESTOR ABOVE' : !selectedMode ? 'SELECT A MODE ABOVE' : 'ENTER THE ARENA →'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -876,7 +999,7 @@ DO NOT show thinking. Just respond in character.`;
         {/* Top section: Camera + Avatar side by side */}
         <View style={styles.pitchTop}>
           <View style={styles.cameraWrapper}>
-            <MediapipeWeb style={styles.cameraFeed} onMetrics={onMediapipeMetrics} />
+            <MediapipeWeb onMetrics={onMediapipeMetrics} style={styles.cameraFeed} />
             <View style={styles.cameraOverlay}>
               <View style={styles.timerPill}>
                 <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
@@ -977,7 +1100,7 @@ DO NOT show thinking. Just respond in character.`;
 
           {/* Stats */}
           <View style={styles.statsCard}>
-            <Text style={styles.statsTitle}>Session Details</Text>
+            <Text style={styles.statsTitle}>SESSION DETAILS</Text>
             <View style={styles.statsGrid}>
               {[
                 { label: 'Words Spoken', value: sessionMetrics.totalWords },
@@ -998,7 +1121,7 @@ DO NOT show thinking. Just respond in character.`;
             <View style={styles.analysisCard}>
               <View style={styles.analysisCardHeader}>
                 <Text style={styles.analysisCardIcon}>🧠</Text>
-                <Text style={styles.analysisCardTitle}>Coach's Analysis</Text>
+                <Text style={styles.analysisCardTitle}>COACH'S ANALYSIS</Text>
               </View>
               <Text style={styles.analysisText}>{visualFeedback}</Text>
             </View>
@@ -1006,7 +1129,9 @@ DO NOT show thinking. Just respond in character.`;
 
           <TouchableOpacity style={styles.primaryBtn} onPress={resetToHome} activeOpacity={0.8}>
             <Text style={styles.primaryBtnText}>Back to Arena</Text>
-            <Text style={styles.primaryBtnArrow}>→</Text>
+            <View style={styles.primaryBtnArrow}>
+              <Text style={styles.primaryBtnArrowText}>→</Text>
+            </View>
           </TouchableOpacity>
 
           <View style={{ height: 40 }} />
@@ -1023,15 +1148,14 @@ DO NOT show thinking. Just respond in character.`;
   }
 }
 
-
-// ==================== STYLES ====================
+// ==================== REFINED STYLES ====================
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
     backgroundColor: 'transparent',
   },
 
-  // === HOME ===
+  // === HOME (REFINED) ===
   homeCentered: {
     flex: 1,
     justifyContent: 'center',
@@ -1043,17 +1167,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 48,
   },
-  logoIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+  logoIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    backgroundColor: C.primary + '20',
+    borderWidth: 2,
+    borderColor: C.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: C.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  logoIconText: {
+    color: C.primaryLight,
+    fontSize: 16,
+    fontWeight: '900',
+    fontFamily: FONT.bold,
+    letterSpacing: 2,
   },
   heroTitle: {
     color: C.text,
-    fontSize: 42,
-    fontWeight: '800',
+    fontSize: 48,
+    fontWeight: '900',
     fontFamily: FONT.bold,
-    letterSpacing: -1,
+    letterSpacing: -2,
     marginBottom: 12,
+    textAlign: 'center',
+  },
+  heroTitleAccent: {
+    color: C.primaryLight,
+    textShadowColor: C.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
   },
   heroSubtitle: {
     color: C.textSecondary,
@@ -1061,36 +1211,47 @@ const styles = StyleSheet.create({
     fontFamily: FONT.regular,
     textAlign: 'center',
     lineHeight: 24,
+    letterSpacing: 0.3,
   },
   primaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: C.primary,
-    paddingVertical: 18,
-    paddingHorizontal: 36,
+    paddingVertical: 20,
+    paddingHorizontal: 40,
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
     marginBottom: 32,
     shadowColor: C.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    elevation: 10,
+    borderWidth: 1,
+    borderColor: C.primaryLight + '40',
   },
   primaryBtnText: {
     color: '#FFF',
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    letterSpacing: 0.3,
+    letterSpacing: 1,
   },
   primaryBtnArrow: {
+    marginLeft: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  primaryBtnArrowText: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
-    marginLeft: 10,
   },
   featureRow: {
     flexDirection: 'row',
@@ -1101,46 +1262,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: C.cardBg,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: C.cardBorder,
   },
-  featureEmoji: {
-    fontSize: 14,
-    marginRight: 6,
+  featureDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: C.accent,
+    marginRight: 8,
+    shadowColor: C.accent,
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
   },
   featureText: {
-    color: C.textSecondary,
+    color: C.text,
     fontSize: 13,
     fontFamily: FONT.medium,
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   tipsCard: {
     backgroundColor: C.cardBg,
     padding: 24,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: C.cardBorder,
+    borderWidth: 1.5,
+    borderColor: C.primary + '30',
     width: '100%',
     maxWidth: 400,
+    shadowColor: C.primary,
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
   },
   tipsTitle: {
     color: C.primaryLight,
-    fontSize: 15,
-    fontWeight: '600',
-    fontFamily: FONT.medium,
-    marginBottom: 10,
+    fontSize: 12,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    marginBottom: 12,
+    letterSpacing: 1.5,
   },
   tipText: {
     color: C.textSecondary,
     fontSize: 14,
     fontFamily: FONT.regular,
     lineHeight: 22,
+    letterSpacing: 0.2,
   },
 
-  // === SETUP ===
+  // === SETUP (REFINED) ===
   setupContent: {
     paddingHorizontal: 24,
     paddingTop: 50,
@@ -1151,41 +1324,51 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginBottom: 20,
     paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   backBtnText: {
     color: C.primaryLight,
-    fontSize: 16,
-    fontFamily: FONT.medium,
-    fontWeight: '500',
+    fontSize: 14,
+    fontFamily: FONT.bold,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   setupHeader: {
     alignItems: 'center',
-    marginBottom: 36,
+    marginBottom: 40,
   },
   setupTitle: {
     color: C.text,
-    fontSize: 32,
-    fontWeight: '800',
+    fontSize: 36,
+    fontWeight: '900',
     fontFamily: FONT.bold,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
     marginBottom: 8,
+    textAlign: 'center',
+  },
+  setupTitleAccent: {
+    color: C.primaryLight,
+    textShadowColor: C.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 15,
   },
   setupSubtitle: {
     color: C.textSecondary,
     fontSize: 15,
     fontFamily: FONT.regular,
+    letterSpacing: 0.3,
   },
   sectionBlock: {
     width: '100%',
-    maxWidth: 500,
-    marginBottom: 32,
+    maxWidth: 520,
+    marginBottom: 36,
   },
   sectionLabel: {
-    color: C.textMuted,
-    fontSize: 12,
-    fontWeight: '700',
+    color: C.accent,
+    fontSize: 11,
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    letterSpacing: 1.5,
+    letterSpacing: 2,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -1193,29 +1376,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
+    gap: 14,
   },
   sharkCard: {
-    width: width > 500 ? 145 : (width - 72) / 2,
+    width: width > 500 ? 150 : (width - 76) / 2,
     backgroundColor: C.cardBg,
     borderRadius: 20,
-    padding: 18,
+    padding: 20,
     borderWidth: 1.5,
     borderColor: C.cardBorder,
     alignItems: 'center',
     position: 'relative',
   },
-  sharkEmoji: {
-    fontSize: 28,
-    marginBottom: 10,
+  sharkIconBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    marginBottom: 12,
+  },
+  sharkIcon: {
+    fontSize: 22,
   },
   sharkName: {
     color: C.text,
-    fontWeight: '700',
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    fontSize: 14,
-    marginBottom: 6,
+    fontSize: 15,
+    marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
   sharkStyle: {
     color: C.textMuted,
@@ -1224,94 +1416,138 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
   },
-  selectedDot: {
+  selectedBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    top: 12,
+    right: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  selectedBadgeText: {
+    color: '#FFF',
+    fontSize: 8,
+    fontWeight: '900',
+    fontFamily: FONT.bold,
+    letterSpacing: 0.5,
   },
   modeGrid: {
-    gap: 10,
+    gap: 12,
   },
   modeCard: {
     flexDirection: 'row',
     backgroundColor: C.cardBg,
-    padding: 18,
-    borderRadius: 16,
+    padding: 20,
+    borderRadius: 18,
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: C.cardBorder,
+    justifyContent: 'space-between',
   },
   modeCardSelected: {
     borderColor: C.primary,
-    backgroundColor: C.primary + '10',
+    backgroundColor: C.primary + '12',
+    borderWidth: 2,
+    shadowColor: C.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 5,
   },
-  modeIcon: {
-    fontSize: 22,
+  modeLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  modeBadge: {
+    backgroundColor: C.cardBorder,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
     marginRight: 14,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  modeBadgeActive: {
+    backgroundColor: C.primary,
+  },
+  modeBadgeText: {
+    color: C.textMuted,
+    fontSize: 10,
+    fontWeight: '900',
+    fontFamily: FONT.bold,
+    letterSpacing: 1,
+  },
+  modeBadgeTextActive: {
+    color: '#FFF',
   },
   modeInfo: {
     flex: 1,
   },
   modeName: {
     color: C.text,
-    fontWeight: '700',
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    fontSize: 15,
+    fontSize: 16,
+    letterSpacing: 0.3,
+  },
+  modeNameActive: {
+    color: C.primaryLight,
   },
   modeDesc: {
     color: C.textMuted,
     fontSize: 13,
     fontFamily: FONT.regular,
     marginTop: 3,
+    letterSpacing: 0.2,
   },
-  modeCheck: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  modeCheckmark: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: C.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modeCheckText: {
+  modeCheckmarkText: {
     color: '#FFF',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
   beginContainer: {
     width: '100%',
-    maxWidth: 500,
+    maxWidth: 520,
     alignItems: 'center',
     marginTop: 8,
   },
   beginButton: {
     backgroundColor: C.primary,
-    paddingVertical: 18,
-    paddingHorizontal: 36,
+    paddingVertical: 20,
+    paddingHorizontal: 40,
     borderRadius: 16,
     width: '100%',
     alignItems: 'center',
     shadowColor: C.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    elevation: 10,
+    borderWidth: 1,
+    borderColor: C.primaryLight + '40',
   },
   beginButtonDisabled: {
-    backgroundColor: C.slateBlue,
+    backgroundColor: C.textMuted + '30',
     shadowOpacity: 0,
+    borderColor: C.cardBorder,
   },
   beginButtonText: {
     color: '#FFF',
-    fontWeight: '700',
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    fontSize: 16,
-    letterSpacing: 0.3,
+    fontSize: 14,
+    letterSpacing: 1.5,
   },
 
-  // === PITCH ===
+  // === PITCH (REFINED - keeping functionality) ===
   pitchContainer: {
     flex: 1,
     backgroundColor: 'transparent',
@@ -1328,6 +1564,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#000',
     position: 'relative',
+    borderWidth: 2,
+    borderColor: C.primary + '30',
   },
   cameraFeed: {
     flex: 1,
@@ -1341,37 +1579,39 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   timerPill: {
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: C.primary + '50',
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: C.primary + '60',
   },
   timerText: {
     color: C.primaryLight,
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     fontFamily: FONT.mono,
+    letterSpacing: 1,
   },
   roundPill: {
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: C.cardBorder,
   },
   roundText: {
     color: C.textSecondary,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     fontFamily: FONT.mono,
+    letterSpacing: 1,
   },
   metricsStrip: {
     flexDirection: 'row',
     backgroundColor: C.surface,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: C.cardBorder,
@@ -1383,14 +1623,14 @@ const styles = StyleSheet.create({
   metricLabel: {
     color: C.textMuted,
     fontSize: 10,
-    fontWeight: '600',
-    fontFamily: FONT.medium,
-    letterSpacing: 0.5,
-    marginBottom: 2,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    letterSpacing: 1,
+    marginBottom: 4,
   },
   metricValue: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '900',
     fontFamily: FONT.bold,
   },
   chatArea: {
@@ -1406,22 +1646,22 @@ const styles = StyleSheet.create({
     backgroundColor: C.primary + '20',
     alignSelf: 'flex-end',
     borderBottomRightRadius: 4,
-    borderWidth: 1,
-    borderColor: C.primary + '30',
+    borderWidth: 1.5,
+    borderColor: C.primary + '40',
   },
   aiBubble: {
     backgroundColor: C.cardBg,
     alignSelf: 'flex-start',
     borderBottomLeftRadius: 4,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: C.cardBorder,
   },
   bubbleSender: {
     color: C.primaryLight,
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    letterSpacing: 0.5,
+    letterSpacing: 1,
     marginBottom: 6,
   },
   bubbleText: {
@@ -1429,6 +1669,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: FONT.regular,
     lineHeight: 22,
+    letterSpacing: 0.2,
   },
   pitchFooter: {
     height: 110,
@@ -1441,61 +1682,63 @@ const styles = StyleSheet.create({
     borderTopColor: C.cardBorder,
   },
   endBtn: {
-    width: 56,
-    height: 40,
-    borderRadius: 10,
+    width: 64,
+    height: 44,
+    borderRadius: 12,
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(239, 68, 68, 0.4)',
   },
   endBtnText: {
     color: '#F87171',
-    fontWeight: '700',
+    fontWeight: '800',
     fontFamily: FONT.bold,
     fontSize: 13,
+    letterSpacing: 0.5,
   },
   micBtn: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     backgroundColor: C.cardBg,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2.5,
+    borderWidth: 3,
     borderColor: C.primary,
     shadowColor: C.primary,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    elevation: 10,
   },
   micBtnActive: {
-    backgroundColor: C.primary + '25',
+    backgroundColor: C.primary + '30',
     borderColor: '#34D399',
     shadowColor: '#34D399',
   },
   micEmoji: {
-    fontSize: 28,
+    fontSize: 32,
   },
   micLabel: {
     color: C.textMuted,
     fontSize: 9,
-    fontWeight: '600',
-    fontFamily: FONT.medium,
-    marginTop: 3,
+    fontWeight: '800',
+    fontFamily: FONT.bold,
+    marginTop: 4,
+    letterSpacing: 0.5,
   },
 
-  // === AVATAR ===
+  // === AVATAR (REFINED) ===
   avatarContainer: {
     width: 130,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: C.cardBg,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: C.cardBorder,
+    borderWidth: 2,
+    borderColor: C.primary + '30',
     padding: 12,
     position: 'relative',
   },
@@ -1507,6 +1750,7 @@ const styles = StyleSheet.create({
     bottom: -10,
     borderRadius: 26,
     backgroundColor: C.primary,
+    opacity: 0.3,
     ...(Platform.OS === 'web' ? { filter: 'blur(20px)' } : {}),
   },
   avatarImage: {
@@ -1515,21 +1759,21 @@ const styles = StyleSheet.create({
     borderRadius: 45,
   },
   speakingPill: {
-    marginTop: 8,
-    backgroundColor: C.primary + '30',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    marginTop: 10,
+    backgroundColor: C.primary + '40',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: 8,
   },
   speakingLabel: {
     color: C.primaryLight,
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '900',
     fontFamily: FONT.bold,
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
 
-  // === ANALYSIS ===
+  // === ANALYSIS (REFINED) ===
   analysisContent: {
     paddingHorizontal: 24,
     paddingTop: 50,
@@ -1537,96 +1781,106 @@ const styles = StyleSheet.create({
   },
   overallScoreContainer: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 36,
   },
   analysisTitle: {
     color: C.text,
-    fontSize: 28,
-    fontWeight: '800',
-    fontFamily: FONT.bold,
-    letterSpacing: -0.5,
-    marginBottom: 24,
-  },
-  overallScoreCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: C.cardBg,
-    marginBottom: 12,
-  },
-  overallGrade: {
     fontSize: 32,
     fontWeight: '900',
     fontFamily: FONT.bold,
+    letterSpacing: -0.5,
+    marginBottom: 28,
+    textAlign: 'center',
+  },
+  overallScoreCircle: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    borderWidth: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: C.cardBg,
+    marginBottom: 14,
+    shadowColor: C.primary,
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  overallGrade: {
+    fontSize: 38,
+    fontWeight: '900',
+    fontFamily: FONT.bold,
+    letterSpacing: -1,
   },
   overallScoreNum: {
     color: C.textSecondary,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     fontFamily: FONT.medium,
+    letterSpacing: 0.5,
   },
   overallLabel: {
     color: C.textMuted,
-    fontSize: 14,
-    fontFamily: FONT.regular,
+    fontSize: 13,
+    fontFamily: FONT.medium,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   scoreRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
-    marginBottom: 20,
+    gap: 14,
+    marginBottom: 24,
     width: '100%',
-    maxWidth: 500,
+    maxWidth: 520,
   },
   scoreCard: {
-    width: (width > 500 ? 500 : width - 60) / 2 - 6,
+    width: (width > 500 ? 520 : width - 62) / 2 - 7,
     backgroundColor: C.cardBg,
-    padding: 20,
+    padding: 22,
     borderRadius: 18,
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: C.cardBorder,
   },
   scoreCardLabel: {
     color: C.textMuted,
     fontSize: 11,
-    fontWeight: '600',
-    fontFamily: FONT.medium,
-    letterSpacing: 0.5,
-    marginBottom: 8,
-  },
-  scoreCardValue: {
-    fontSize: 28,
     fontWeight: '800',
     fontFamily: FONT.bold,
+    letterSpacing: 1,
+    marginBottom: 10,
+  },
+  scoreCardValue: {
+    fontSize: 32,
+    fontWeight: '900',
+    fontFamily: FONT.bold,
+    letterSpacing: -1,
   },
   scoreCardGrade: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    marginTop: 4,
+    marginTop: 6,
+    letterSpacing: 0.5,
   },
   statsCard: {
     backgroundColor: C.cardBg,
-    padding: 24,
+    padding: 26,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: C.cardBorder,
     width: '100%',
-    maxWidth: 500,
-    marginBottom: 20,
+    maxWidth: 520,
+    marginBottom: 24,
   },
   statsTitle: {
     color: C.primaryLight,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    letterSpacing: 0.5,
-    marginBottom: 16,
+    letterSpacing: 1.5,
+    marginBottom: 18,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -1637,46 +1891,53 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: C.text,
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '900',
     fontFamily: FONT.bold,
+    letterSpacing: -0.5,
   },
   statLabel: {
     color: C.textMuted,
     fontSize: 11,
-    fontFamily: FONT.regular,
-    marginTop: 4,
+    fontFamily: FONT.medium,
+    fontWeight: '600',
+    marginTop: 5,
+    letterSpacing: 0.3,
   },
   analysisCard: {
-    backgroundColor: C.primary + '0A',
-    padding: 24,
+    backgroundColor: C.primary + '0D',
+    padding: 26,
     borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: C.primary + '30',
+    borderWidth: 2,
+    borderColor: C.primary + '35',
     width: '100%',
-    maxWidth: 500,
-    marginBottom: 28,
+    maxWidth: 520,
+    marginBottom: 32,
+    shadowColor: C.primary,
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
   },
   analysisCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 18,
   },
   analysisCardIcon: {
-    fontSize: 20,
-    marginRight: 10,
+    fontSize: 22,
+    marginRight: 12,
   },
   analysisCardTitle: {
     color: C.primaryLight,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     fontFamily: FONT.bold,
-    letterSpacing: 0.3,
+    letterSpacing: 1.2,
   },
   analysisText: {
     color: C.text,
     fontSize: 15,
     fontFamily: FONT.regular,
-    lineHeight: 24,
+    lineHeight: 25,
+    letterSpacing: 0.2,
   },
 });
