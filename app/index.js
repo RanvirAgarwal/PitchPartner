@@ -18,9 +18,9 @@ import FluidUI from './FluidUI';
 
 // --- CONFIGURATION ---
 // ⚠️ IMPORTANT: Replace these with your actual API keys
-const FEATHERLESS_API_KEY = 'rc_1a19fe2efea58e9740fa15291133f16d8c2c3238a179a48e566250e032251fbc';
-const DEEPGRAM_API_KEY = '64c0fd8f103661e12ce9ac9695b8b1588f14570a';
-const ELEVENLABS_API_KEY = 'sk_01b7bd3fb09ba0e2a2fefb609901d9609c8b6c77e366ae5f'; // <--- ADD THIS
+const FEATHERLESS_API_KEY = 'PLACEHOLDER';
+const DEEPGRAM_API_KEY = 'PLACEHOLDER';
+const ELEVENLABS_API_KEY = 'PLACEHOLDER'; // <--- ADD THIS
 const LLM_MODEL = "deepseek-ai/DeepSeek-R1-0528";
 
 const { width, height } = Dimensions.get('window');
